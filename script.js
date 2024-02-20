@@ -110,12 +110,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createGlow(x, y) {
-        litAreas.push({ x, y });
+        // Select a color for this lit area
+        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
+
+        // Add the lit area with its color to the array
+        litAreas.push({ x, y, color: selectedColor });
+
+        // Reveal notes if they are within the beam's radius
         notesData.forEach(note => {
             if (!note.revealed && Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2)) <= beamRadius) {
                 note.revealed = true;
             }
         });
+
         redrawCanvas();
     }
 
