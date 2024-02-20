@@ -82,17 +82,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createGlow(x, y) {
-        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 50);
-        gradient.addColorStop(0, selectedColor[0]); // Bright center
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Fading to transparent
+    const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
+    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 100); // Increase the outer radius for a wider beam
+    gradient.addColorStop(0, selectedColor[0]); // Bright center
+    gradient.addColorStop(0.2, selectedColor[0].replace('0.8', '0.6')); // Slightly less intense
+    gradient.addColorStop(0.8, 'rgba(0, 0, 0, 0)'); // Gradual fade to transparent
 
-        ctx.beginPath();
-        ctx.arc(x, y, 50, 0, 2 * Math.PI);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-    }
-
+    ctx.beginPath();
+    ctx.arc(x, y, 100, 0, 2 * Math.PI); // Match the outer radius of the gradient
+    ctx.fillStyle = gradient;
+    ctx.fill();
+}
+    
     canvas.addEventListener('mousedown', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
