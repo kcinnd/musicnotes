@@ -8,12 +8,12 @@
 
 /* Style for the canvas overlay */
 #overlay {
+    background: #000;
     position: absolute; /* Positioned relative to its parent due to parent's relative positioning */
     top: 0;
     left: 0;
     width: 100%; /* Full width of the container */
     height: 100%; /* Full height of the container */
-    z-index: 1; /* Ensures the canvas is above the container background but below the notes */
 }
 
 /* Style for the music notes */
@@ -25,7 +25,6 @@
     background-repeat: no-repeat; /* Prevents the image from repeating within the note */
     background-position: center; /* Centers the background image within the note */
     visibility: hidden; /* Notes are initially hidden and become visible when "lit up" */
-    z-index: 2; /* Ensures notes are above the canvas overlay */
     cursor: pointer; /* Changes the cursor to a pointer when hovering over a note (optional) */
 }
 
