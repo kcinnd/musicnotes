@@ -8,7 +8,7 @@
 
 /* Style for the canvas overlay */
 #overlay {
-    position: absolute; /* Positioned relative to its parent due to parent's relative positioning */
+    position: fixed; /* Positioned relative to its parent due to parent's relative positioning */
     top: 0;
     left: 0;
     width: 100%; /* Full width of the container */
