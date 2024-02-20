@@ -95,36 +95,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function createGlow(x, y) {
+        // Clear the canvas and redraw the black background
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Choose a random beam color
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, selectedColor);
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(0, selectedColor[0]); // Center of the beam
+        gradient.addColorStop(1, selectedColor[1]); // Edge of the beam
 
-        // Clear only the beam area to simulate revealing
-        ctx.globalCompositeOperation = 'destination-out';
+        // Draw the beam
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
+        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
         ctx.fill();
 
-        ctx.globalCompositeOperation = 'source-over';
-
-        // Reveal notes if they are in the beam area
+        // Reveal and draw notes within the beam area
         notesData.forEach(note => {
-            if (Math.hypot(note.x + img.width / 2 - x, note.y + img.height / 2 - y) <= beamRadius) {
+            if (Math.hypot(note.x + note.img.width / 2 - x, note.y + note.img.height / 2 - y) <= beamRadius) {
                 note.revealed = true;
-            }
-        });
-
-        // Redraw the notes to ensure they are visible if revealed
-        notesData.forEach(note => {
-            if (note.revealed) {
                 ctx.drawImage(note.img, note.x, note.y);
             }
         });
     }
 
-    canvas.addEventListener('click', function(event) {
+    canvas.addEventListener('mousemove', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
