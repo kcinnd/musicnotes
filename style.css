@@ -21,9 +21,9 @@ body, html {
 
 .music-note {
     position: absolute;
-    width: 20px; /* Adjust based on your note image size */
+    width: 20px; /* Adjust based on your desired note size */
     height: 20px;
-    background-image: url('path/to/your/music-note.png');
+    background-image: url('https://i.imgur.com/fThpcNc.png'); /* Music note image */
     background-size: cover;
     visibility: hidden; /* Start hidden and become visible when the overlay is cleared */
 }
