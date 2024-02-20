@@ -23,31 +23,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to create a glow effect and optionally clear the overlay
 function createGlow(x, y, clearOverlay = false) {
-    // First, clear the area if needed to reveal any hidden notes beneath the canvas
+    // Clear the area if needed to reveal any hidden notes beneath the canvas
     if (clearOverlay) {
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
         ctx.arc(x, y, 20, 0, Math.PI * 2, false);
         ctx.fill();
+        ctx.globalCompositeOperation = 'source-over'; // Reset the composite operation
     }
 
-    // Set the composite operation back to draw the glow effect on top
-    ctx.globalCompositeOperation = 'source-over';
+    // Create a radial gradient for the flashlight beam effect
+    let gradient = ctx.createRadialGradient(x, y, 1, x, y, 50); // Start small and spread out
+    gradient.addColorStop(0, 'rgba(255, 255, 224, 0.8)'); // Bright center
+    gradient.addColorStop(0.2, 'rgba(255, 255, 224, 0.6)'); // Less intense
+    gradient.addColorStop(0.5, 'rgba(255, 255, 224, 0.3)'); // Beginning to fade
+    gradient.addColorStop(0.8, 'rgba(255, 255, 224, 0.1)'); // Barely visible
+    gradient.addColorStop(1, 'rgba(255, 255, 224, 0)'); // Fully transparent at the edges
 
-    // Create a radial gradient for the glow effect
-    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 30); // Adjust the outer radius for a larger glow
-    gradient.addColorStop(0, 'rgba(255, 255, 0, 1)'); // Bright yellow center
-    gradient.addColorStop(0.2, 'rgba(255, 255, 0, 0.5)'); // Less intense yellow
-    gradient.addColorStop(0.4, 'rgba(255, 255, 0, 0.2)'); // Fading glow
-    gradient.addColorStop(1, 'rgba(255, 255, 0, 0)'); // Transparent at the edges
+    // Increase shadowBlur to enhance the glow effect
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = 'yellow';
 
-    // Apply shadow to create a softer glow effect
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = "yellow";
-
-    // Draw the glow effect using the radial gradient
+    // Draw the flashlight beam using the radial gradient
     ctx.beginPath();
-    ctx.arc(x, y, 30, 0, Math.PI * 2, false); // Use the same outer radius as the gradient
+    ctx.arc(x, y, 50, 0, Math.PI * 2, false); // The outer radius of the gradient
     ctx.fillStyle = gradient;
     ctx.fill();
 
