@@ -1,14 +1,14 @@
 /* Style for the container that holds the canvas and music notes */
 #container {
-    position: relative; /* Required for absolute positioning of child elements */
-    width: 100vw; /* Full width of the viewport */
-    height: 100vh; /* Full height of the viewport */
-    overflow: hidden; /* Prevents scrolling if the content overflows */
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: black;
 }
 
 /* Style for the canvas overlay */
 #overlay {
-    position: fixed; /* Positioned relative to its parent due to parent's relative positioning */
+    position: absolute; /* Positioned relative to its parent due to parent's relative positioning */
     top: 0;
     left: 0;
     width: 100%; /* Full width of the container */
