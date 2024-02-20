@@ -61,5 +61,21 @@ document.getElementById('container').addEventListener('click', function(event) {
     if (dx < 20 && dy < 20) { // Threshold for "close enough"
       document.getElementById(note.id).style.display = 'block';
     }
-  });
+container.addEventListener('click', function(event) {
+        let x = event.pageX - this.offsetLeft;
+        let y = event.pageY - this.offsetTop;
+
+        // Check each note to see if the click was within its area
+        notes.forEach(note => {
+            if (Math.abs(x - note.x) < 20 && Math.abs(y - note.y) < 20) { // Adjust threshold as needed
+                note.element.style.visibility = 'visible'; // Reveal the note
+                if (note.audio.paused) {
+                    note.audio.play();
+                } else {
+                    note.audio.pause();
+                    note.audio.currentTime = 0;
+                }
+            }
+        });
+    });
 });
