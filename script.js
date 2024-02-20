@@ -86,42 +86,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function drawNotes() {
-        notesData.forEach(note => {
-            if (note.revealed) {
-                ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
-            }
-        });
-    }
-
-    function createGlow(x, y) {
+    function redrawCanvas() {
         // Clear the canvas and redraw the black background
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Choose a random beam color
-        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, selectedColor[0]); // Center of the beam
-        gradient.addColorStop(1, selectedColor[1]); // Edge of the beam
+        // Redraw all previously lit areas
+        litAreas.forEach(area => {
+            const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
+            gradient.addColorStop(0, beamColor);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(area.x, area.y, beamRadius, 0, 2 * Math.PI);
+            ctx.fill();
+        });
 
-        // Draw the beam
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
-        ctx.fill();
-
-        // Reveal and draw notes within the beam area
+        // Redraw revealed notes
         notesData.forEach(note => {
-            if (Math.hypot(note.x + note.img.width / 2 - x, note.y + note.img.height / 2 - y) <= beamRadius) {
-                note.revealed = true;
+            if (note.revealed) {
                 ctx.drawImage(note.img, note.x, note.y);
             }
         });
     }
 
-    canvas.addEventListener('mousemove', function(event) {
+    function createGlow(x, y) {
+        // Add the current lit area to the array
+        litAreas.push({ x, y });
+
+        // Check if notes are within the beam's radius and reveal them
+        notesData.forEach(note => {
+            if (!note.revealed && Math.hypot(x - (note.x + note.img.width / 2), y - (note.y + note.img.height / 2)) <= beamRadius) {
+                note.revealed = true;
+            }
+        });
+
+        redrawCanvas();
+    }
+
+    canvas.addEventListener('click', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
