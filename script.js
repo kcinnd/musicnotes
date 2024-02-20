@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const notesData = []; // Array to hold data for each note
     const litAreas = []; // Array to track lit areas
     const beamRadius = 50; // Radius of the flashlight beam
+    const noteSize = 50; // Fixed size for the notes
     
     const beamColors = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
@@ -87,40 +88,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function redrawCanvas() {
-        // Clear the canvas and redraw the black background
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Redraw all previously lit areas
         litAreas.forEach(area => {
+            const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
             const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
-            gradient.addColorStop(0, beamColor);
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            gradient.addColorStop(0, selectedColor[0]);
+            gradient.addColorStop(1, selectedColor[1]);
             ctx.fillStyle = gradient;
             ctx.beginPath();
             ctx.arc(area.x, area.y, beamRadius, 0, 2 * Math.PI);
             ctx.fill();
         });
 
-        // Redraw revealed notes
         notesData.forEach(note => {
             if (note.revealed) {
-                ctx.drawImage(note.img, note.x, note.y);
+                ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
             }
         });
     }
 
     function createGlow(x, y) {
-        // Add the current lit area to the array
         litAreas.push({ x, y });
-
-        // Check if notes are within the beam's radius and reveal them
         notesData.forEach(note => {
-            if (!note.revealed && Math.hypot(x - (note.x + note.img.width / 2), y - (note.y + note.img.height / 2)) <= beamRadius) {
+            if (!note.revealed && Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2)) <= beamRadius) {
                 note.revealed = true;
             }
         });
-
         redrawCanvas();
     }
 
