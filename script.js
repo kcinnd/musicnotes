@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('container');
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
-    const notesData = [];
+
+    // Array of music note image URLs
     const noteImages = [
     "https://static.vecteezy.com/system/resources/previews/024/091/810/original/music-note-in-star-neon-free-png.png",
     "https://static.vecteezy.com/system/resources/previews/024/091/600/non_2x/music-notes-and-stars-neon-free-png.png",
@@ -26,23 +27,26 @@ document.addEventListener('DOMContentLoaded', function() {
     "https://i.pinimg.com/736x/a8/0c/86/a80c86aca3d06da45f7934d9b571572a.jpg",
     "https://www.shutterstock.com/shutterstock/videos/1109339305/thumb/4.jpg?ip=x480",
     "https://i.pinimg.com/1200x/21/90/5d/21905dbb8598de8d025b29b04c0b1f5e.jpg"
-];
+    ];
     const beamColors = [
     // Existing colors...
     ['rgba(255, 0, 0, 0.8)', 'rgba(255, 0, 0, 0)'], // Red
-    // Other colors...
+    ['rgba(255, 105, 180, 0.8)', 'rgba(255, 105, 180, 0)'], // Neon Pink
+    ['rgba(255, 165, 0, 0.8)', 'rgba(255, 165, 0, 0)'], // Neon Orange
+    ['rgba(255, 255, 0, 0.8)', 'rgba(255, 255, 0, 0)'], // Neon Yellow
+    ['rgba(0, 255, 0, 0.8)', 'rgba(0, 255, 0, 0)'], // Neon Green
+    ['rgba(0, 255, 255, 0.8)', 'rgba(0, 255, 255, 0)'], // Neon Cyan
+    ['rgba(75, 0, 130, 0.8)', 'rgba(75, 0, 130, 0)'], // Indigo
     ['rgba(238, 130, 238, 0.8)', 'rgba(238, 130, 238, 0)'], // Violet
     // Additional new colors
     ['rgba(64, 224, 208, 0.8)', 'rgba(64, 224, 208, 0)'], // Turquoise
     ['rgba(255, 69, 0, 0.8)', 'rgba(255, 69, 0, 0)'], // Red-Orange
     ['rgba(255, 215, 0, 0.8)', 'rgba(255, 215, 0, 0)'], // Gold
     ['rgba(0, 100, 0, 0.8)', 'rgba(0, 100, 0, 0)'], // Dark Green
-    ['rgba(65, 105, 225, 0.8)', 'rgba(65, 105, 225, 0)'], // Royal Blue
     ['rgba(106, 90, 205, 0.8)', 'rgba(106, 90, 205, 0)'], // Slate Blue
     ['rgba(72, 209, 204, 0.8)', 'rgba(72, 209, 204, 0)'], // Medium Turquoise
     ['rgba(147, 112, 219, 0.8)', 'rgba(147, 112, 219, 0)'], // Medium Purple
     ['rgba(255, 20, 147, 0.8)', 'rgba(255, 20, 147, 0)'], // Deep Pink
-    ['rgba(75, 0, 130, 0.8)', 'rgba(75, 0, 130, 0)'], // Indigo
     ['rgba(255, 140, 0, 0.8)', 'rgba(255, 140, 0, 0)'], // Dark Orange
     ['rgba(0, 191, 255, 0.8)', 'rgba(0, 191, 255, 0)'], // Deep Sky Blue
     ['rgba(220, 20, 60, 0.8)', 'rgba(220, 20, 60, 0)'] // Crimson
