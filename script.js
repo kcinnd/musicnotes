@@ -94,18 +94,19 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.fill();
 }
     
-    canvas.addEventListener('mousedown', function(event) {
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+   canvas.addEventListener('mousedown', function(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
 
-        notesData.forEach(note => {
-            if (Math.abs(x - note.x) < 20 && Math.abs(y - note.y) < 20 && !note.uncovered) {
-                note.element.style.visibility = 'visible';
-                note.uncovered = true;
-            }
-        });
-
-        createGlow(x, y);
+    notesData.forEach(note => {
+        let distance = Math.sqrt(Math.pow(x - note.x - 25, 2) + Math.pow(y - note.y - 25, 2)); // Adjust for note size
+        if (distance < 50 && !note.uncovered) { // 50px radius for detection, adjust as needed
+            note.element.style.visibility = 'visible';
+            note.uncovered = true;
+        }
     });
+
+    createGlow(x, y);
 });
+    
