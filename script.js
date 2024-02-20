@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 overlaps = notesData.some(note => {
                     const dx = note.x - x;
                     const dy = note.y - y;
-                    return Math.sqrt(dx * dx + dy * dy) < beamRadius * 2; // Ensure notes are spaced out
+                    return Math.sqrt(dx * dx + dy * dy) < beamRadius * 2; // Ensuring notes are spaced out
                 });
             } while (overlaps);
 
@@ -74,26 +74,30 @@ document.addEventListener('DOMContentLoaded', function() {
         img.src = src;
     });
 
-    // Function to draw a note if it has been revealed
-    function drawNoteIfRevealed(note) {
-        if (note.revealed) {
-            ctx.drawImage(note.image, note.x, note.y, note.width, note.height);
-        }
+    // Function to draw notes if they have been revealed
+    function drawNotes() {
+        notesData.forEach(note => {
+            if (note.revealed) {
+                ctx.drawImage(note.image, note.x, note.y, note.width, note.height);
+            }
+        });
     }
 
-    // Function to create the glow effect of the flashlight beam and reveal notes within its radius
+    // Function to create the flashlight beam effect and reveal notes
     function createGlow(x, y) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas for each movement
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
+        // Check each note to see if it's within the beam's radius and reveal it
         notesData.forEach(note => {
             const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
             if (distance < beamRadius) {
-                note.revealed = true; // Reveal the note if within the flashlight beam
+                note.revealed = true;
             }
-            drawNoteIfRevealed(note); // Draw the note if it's been revealed
         });
 
-        // Create the flashlight beam effect
+        drawNotes(); // Redraw all revealed notes
+
+        // Draw the flashlight beam
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
         gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
         gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
@@ -103,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fill();
     }
 
-    // Event listener for mouse movement to create the flashlight beam effect
+    // Event listener for mouse movement
     canvas.addEventListener('mousemove', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
@@ -115,5 +119,10 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', function() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawNotes(); // Redraw notes on resize to ensure they are not lost
     });
+
+    resizeCanvas(); // Initial setup to set canvas size and background
 });
