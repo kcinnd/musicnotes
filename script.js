@@ -61,6 +61,24 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    function isTooClose(x, y, minDistance) {
+    return notesData.some(note => {
+        const dx = x - note.x;
+        const dy = y - note.y;
+        return Math.sqrt(dx * dx + dy * dy) < minDistance;
+    });
+}
+
+for (let i = 0; i < 19; i++) {
+    let note, randomX, randomY, tooClose;
+    do {
+        note = document.createElement('div');
+        note.className = 'music-note';
+        randomX = Math.random() * (canvas.width - 50);
+        randomY = Math.random() * (canvas.height - 50);
+        tooClose = isTooClose(randomX, randomY, 50); // Using 100px as minimum distance
+    } while (tooClose);
+
     // Create and position music notes, then store their data in notesData
     for (let i = 0; i < 19; i++) {
         let note = document.createElement('div');
@@ -77,18 +95,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to create a glow effect with a realistic flashlight beam
     function createGlow(x, y) {
-        const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
-        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
+    const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
+    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 50); // Reduced radius to 50 for a smaller beam
 
-        gradient.addColorStop(0, selectedColors[0]); // Intense center
-        gradient.addColorStop(0.6, selectedColors[0].replace('1)', '0.2)')); // Softer edge
-        gradient.addColorStop(1, selectedColors[1]); // Transparent edge
+    gradient.addColorStop(0, selectedColors[0]);
+    gradient.addColorStop(0.6, selectedColors[1]);
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        ctx.beginPath();
-        ctx.arc(x, y, 100, 0, 2 * Math.PI);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-    }
+    ctx.beginPath();
+    ctx.arc(x, y, 50, 0, 2 * Math.PI); // Match the radius used for the gradient
+    ctx.fillStyle = gradient;
+    ctx.fill();
+}
 
     // Event listener for mouse clicks on the canvas to reveal notes and create glow
     canvas.addEventListener('mousedown', function(event) {
