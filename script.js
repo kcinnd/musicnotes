@@ -93,28 +93,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to create the flashlight beam effect and reveal notes
     function createGlow(x, y) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
-        // Check each note to see if it's within the beam's radius and reveal it
-        notesData.forEach(note => {
-            const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
-            if (distance < beamRadius) {
-                note.revealed = true;
-            }
-        });
+    notesData.forEach(note => {
+        const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
+        if (distance < beamRadius) {
+            note.revealed = true;
+        }
+    });
 
-        drawNotes(); // Redraw all revealed notes
+    drawNotes(); // Redraw all revealed notes
 
-        // Draw the flashlight beam
-        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, selectedColor[0]);
-        gradient.addColorStop(1, selectedColor[1]);
-        ctx.beginPath();
-        ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-    }
+    // Draw the flashlight beam
+    const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
+    gradient.addColorStop(0, selectedColor[0]); // Intense center
+    gradient.addColorStop(0.9, selectedColor[0]); // Almost at the edge, maintain intensity
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Sharp transition to transparent
+    ctx.beginPath();
+    ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+}
 
     // Event listener for mouse movement
     canvas.addEventListener('mousemove', function(event) {
