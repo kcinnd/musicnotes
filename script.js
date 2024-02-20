@@ -18,12 +18,13 @@ document.addEventListener('DOMContentLoaded', function() {
 function lightUp(x, y) {
   let light = document.createElement('div');
   light.style.position = 'absolute';
-  light.style.left = `${x - 25}px`; // Centering the light-up effect
+  light.style.left = `${x - 25}px`; // Centering the glow effect
   light.style.top = `${y - 25}px`;
   light.style.width = '50px';
   light.style.height = '50px';
   light.style.borderRadius = '50%';
-  light.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent white
+  light.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white for the glow center
+  light.style.boxShadow = '0 0 15px 10px rgba(255, 255, 255, 0.5)'; // Soft white glow
   document.getElementById('container').appendChild(light);
 }
 
