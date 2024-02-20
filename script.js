@@ -48,13 +48,21 @@ document.addEventListener('DOMContentLoaded', function() {
     "https://i.imgur.com/IVHM0uZ.png"
     ];
     // Preload images and store note data without drawing them
+   
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
     noteImages.forEach(src => {
         const img = new Image();
         img.onload = () => {
             let x, y, overlaps;
             do {
-                x = Math.random() * (canvas.width - img.width);
-                y = Math.random() * (canvas.height - img.height);
+                x = Math.random() * (canvas.width - 50); // Assuming notes are 50x50 for positioning
+                y = Math.random() * (canvas.height - 50);
                 overlaps = notesData.some(note => {
                     const dx = note.x - x;
                     const dy = note.y - y;
@@ -98,9 +106,10 @@ document.addEventListener('DOMContentLoaded', function() {
         drawNotes(); // Redraw all revealed notes
 
         // Draw the flashlight beam
+        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        gradient.addColorStop(0, selectedColor[0]);
+        gradient.addColorStop(1, selectedColor[1]);
         ctx.beginPath();
         ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
         ctx.fillStyle = gradient;
@@ -116,13 +125,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Resize the canvas to fill the browser window dynamically
-    window.addEventListener('resize', function() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawNotes(); // Redraw notes on resize to ensure they are not lost
-    });
+    window.addEventListener('resize', resizeCanvas);
 
-    resizeCanvas(); // Initial setup to set canvas size and background
+    // Initial canvas setup
+    resizeCanvas();
 });
