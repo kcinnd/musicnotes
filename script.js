@@ -1,3 +1,20 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('container');
+    const containerWidth = container.offsetWidth;
+    const containerHeight = container.offsetHeight;
+
+    // Loop to position each music note randomly within the container
+    for (let i = 1; i <= 19; i++) {
+        let note = document.getElementById(`note${i}`);
+        let randomX = Math.floor(Math.random() * (containerWidth - 20)); // Assuming note width of 20px
+        let randomY = Math.floor(Math.random() * (containerHeight - 20)); // Assuming note height of 20px
+
+        note.style.left = `${randomX}px`;
+        note.style.top = `${randomY}px`;
+        note.style.display = 'block';
+    }
+});
+
 function lightUp(x, y) {
   let light = document.createElement('div');
   light.style.position = 'absolute';
