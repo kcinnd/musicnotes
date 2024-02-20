@@ -101,6 +101,12 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height); // Refill the canvas with black
 
+        // Choose a random flashlight beam color
+        const beamColor = beamColors[Math.floor(Math.random() * beamColors.length)];
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
+        gradient.addColorStop(0, beamColor);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
         // Check each note to see if it's within the beam's radius and reveal it
         notesData.forEach(note => {
             const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
@@ -112,9 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
         drawNotes(); // Redraw all revealed notes
 
         // Draw the flashlight beam
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, beamColor);
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.beginPath();
         ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
         ctx.fillStyle = gradient;
@@ -127,5 +130,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         createGlow(x, y);
+    });
+
+    // Resize the canvas to fill the browser window dynamically
+    window.addEventListener('resize', function() {
+        resizeCanvas();
+        drawNotes(); // Redraw notes to ensure they are not lost on resize
     });
 });
