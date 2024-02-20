@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = canvas.getContext('2d');
     const notesData = []; // Array to hold data for each note
     const beamRadius = 50; // Radius of the flashlight beam
+    
     const beamColor = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
     ['rgba(189, 0, 255, 1)', 'rgba(189, 0, 255, 0)'],
@@ -31,13 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    resizeCanvas();
 
-    // Listen for window resize to adjust the canvas size
-    window.addEventListener('resize', resizeCanvas); 
-    
-    // Array of music note image URLs
-    const noteImages = [
+    // Function to preload note images and associate them with positions and audio files
+    function preloadNotes() {
+        const noteImages = [
     "https://i.imgur.com/CJ09TQq.png",
     "https://i.imgur.com/b5fsfMv.png",
     "https://i.imgur.com/iAKvZfs.png",
@@ -60,81 +58,64 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
     // Preload images and store note data without drawing them
    
-   noteImages.forEach(src => {
-        const img = new Image();
-        img.onload = () => {
-            let x, y, overlaps;
-            do {
-                x = Math.random() * (canvas.width - img.width);
-                y = Math.random() * (canvas.height - img.height);
-                overlaps = notesData.some(note => {
-                    const dx = note.x - x;
-                    const dy = note.y - y;
-                    return Math.sqrt(dx * dx + dy * dy) < beamRadius * 2;
+   noteImages.forEach((src, index) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                const x = Math.random() * (canvas.width - img.width);
+                const y = Math.random() * (canvas.height - img.height);
+                notesData.push({
+                    img: img,
+                    x: x,
+                    y: y,
+                    revealed: false,
+                    audio: new Audio('path/to/audio' + index + '.mp3') // Associate each note with an audio file
                 });
-            } while (overlaps);
-
-            notesData.push({
-                x: x,
-                y: y,
-                width: img.width,
-                height: img.height,
-                image: img,
-                revealed: false
-            });
-        };
-        img.src = src;
-    });
-
-    // Function to draw notes if they have been revealed
-    function drawNotes() {
-        notesData.forEach(note => {
-            if (note.revealed) {
-                ctx.drawImage(note.image, note.x, note.y, note.width, note.height);
-            }
+            };
         });
     }
 
     // Function to create the flashlight beam effect and reveal notes
     function createGlow(x, y) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height); // Refill the canvas with black
-
-        // Choose a random flashlight beam color
-        const beamColor = beamColors[Math.floor(Math.random() * beamColors.length)];
+        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, beamColor);
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        gradient.addColorStop(0, selectedColor);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        // Check each note to see if it's within the beam's radius and reveal it
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+
         notesData.forEach(note => {
-            const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
-            if (distance < beamRadius) {
+            if (!note.revealed && x >= note.x && x <= note.x + note.img.width && y >= note.y && y <= note.y + note.img.height) {
                 note.revealed = true;
+                // Function to handle note click, play or pause the music
+                canvas.addEventListener('click', function(e) {
+                    const clickX = e.clientX - canvas.getBoundingClientRect().left;
+                    const clickY = e.clientY - canvas.getBoundingClientRect().top;
+                    if (clickX >= note.x && clickX <= note.x + note.img.width && clickY >= note.y && clickY <= note.y + note.img.height) {
+                        if (note.audio.paused) {
+                            note.audio.play();
+                        } else {
+                            note.audio.pause();
+                        }
+                    }
+                }, false);
             }
         });
-
-        drawNotes(); // Redraw all revealed notes
-
-        // Draw the flashlight beam
-        ctx.beginPath();
-        ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
     }
 
-    // Event listener for mouse movement
-    canvas.addEventListener('mousemove', function(event) {
+    // Event listener for mouse click to create the glow effect
+    canvas.addEventListener('click', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         createGlow(x, y);
     });
 
-    // Resize the canvas to fill the browser window dynamically
-    window.addEventListener('resize', function() {
-        resizeCanvas();
-        drawNotes(); // Redraw notes to ensure they are not lost on resize
-    });
+    resizeCanvas();
+    preloadNotes();
 });
