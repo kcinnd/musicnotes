@@ -108,10 +108,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    function drawFlashlightBeam(x, y) {
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
+        gradient.addColorStop(0, flashlightColor);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
+        ctx.fill();
+    }
 
     function createGlow(x, y) {
-        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-        litAreas.push({ x, y, color: selectedColor });
+        litAreas.push({ x, y });  // Store the center of the new beam
 
         notesData.forEach(note => {
             if (!note.revealed && Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2)) <= beamRadius) {
