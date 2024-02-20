@@ -22,24 +22,34 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', resizeCanvas);
 
     // Function to create a glow effect and optionally clear the overlay
- function createGlow(x, y, clearOverlay = false) {
-    // Create a radial gradient for the glow effect
-    let gradient = ctx.createRadialGradient(x, y, 1, x, y, 20);
-    gradient.addColorStop(0, 'rgba(255, 255, 224, 0.8)'); // Bright center
-    gradient.addColorStop(0.4, 'rgba(255, 255, 224, 0.6)'); // Fading yellow
-    gradient.addColorStop(1, 'rgba(255, 255, 224, 0)'); // Transparent outer edge
-
-    ctx.beginPath();
-    ctx.arc(x, y, 20, 0, Math.PI * 2, false);
-    ctx.fillStyle = gradient;
-
+function createGlow(x, y, clearOverlay = false) {
+    // First, clear the area if needed to reveal any hidden notes beneath the canvas
     if (clearOverlay) {
-        ctx.globalCompositeOperation = 'destination-out'; // Clear the overlay to reveal notes
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2, false);
         ctx.fill();
-        ctx.globalCompositeOperation = 'destination-over'; // Draw the glow beneath the overlay
     }
 
-    ctx.fill(); // Draw the glow
+    // Set the composite operation back to draw the glow effect on top
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Create a radial gradient for the glow effect
+    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 30); // Adjust the outer radius for a larger glow
+    gradient.addColorStop(0, 'rgba(255, 255, 0, 1)'); // Bright yellow center
+    gradient.addColorStop(0.2, 'rgba(255, 255, 0, 0.5)'); // Less intense yellow
+    gradient.addColorStop(0.4, 'rgba(255, 255, 0, 0.2)'); // Fading glow
+    gradient.addColorStop(1, 'rgba(255, 255, 0, 0)'); // Transparent at the edges
+
+    // Apply shadow to create a softer glow effect
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "yellow";
+
+    // Draw the glow effect using the radial gradient
+    ctx.beginPath();
+    ctx.arc(x, y, 30, 0, Math.PI * 2, false); // Use the same outer radius as the gradient
+    ctx.fillStyle = gradient;
+    ctx.fill();
 
     // Reset shadowBlur for future drawings
     ctx.shadowBlur = 0;
