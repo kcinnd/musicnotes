@@ -27,28 +27,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Array of music note image URLs
     const noteImages = [
-    "https://static.vecteezy.com/system/resources/previews/024/091/810/original/music-note-in-star-neon-free-png.png",
-    "https://static.vecteezy.com/system/resources/previews/024/091/600/non_2x/music-notes-and-stars-neon-free-png.png",
-    // The same URL is listed twice in your provided links, ensure to replace one if it was a mistake
-    "https://static.vecteezy.com/system/resources/previews/024/091/600/non_2x/music-notes-and-stars-neon-free-png.png",
-    "https://www.pngall.com/wp-content/uploads/13/Neon-Music-PNG-Images.png",
-    "https://totalpng.com//public/uploads/preview/glowing-music-png-11656425559snjsvmu6wj.png",
-    "https://totalpng.com//public/uploads/preview/neon-music-png-transparent-images-free-download-11668596591kmtn8fnv3c.png",
-    "https://images.pngnice.com/download/2314/Neon-Light-PNG-File.png",
-    "https://w7.pngwing.com/pngs/414/573/png-transparent-musical-note-musical-notation-trill-musical-instruments-musical-note-purple-violet-neon.png",
-    // Note: This URL might not be direct to an image file. Ensure it's correct or replace it.
-    "https://www.bhmpics.com/downloads/neon-music-notes-wallpaper-/30.beautiful-black-background-of-neon-musical-note-icon.jpg",
-    // The next URLs might not directly link to images or are from video stock websites, ensure to replace them with direct image links
-    "https://media.istockphoto.com/id/1211986724/video/beautiful-black-background-of-neon-musical-note-icon.jpg?s=640x640&k=20&c=jYolNxQssxkXObohhpywSJiR5_whNeYoIcnnF273nZo=",
-    "https://media.istockphoto.com/id/1349681167/video/glowing-colorful-neon-line-treble-clef-icon-isolated-on-black-animated-treble-clef-sign.jpg?s=640x640&k=20&c=RQ8BQKU18SND4ns7q5aFgEBXESKfZSuT3ezAI7qSjdk=",
-    "https://i.pinimg.com/564x/71/89/4a/71894afad2fea688b5a6914f8bcb85ea.jpg",
-    "https://static.vecteezy.com/system/resources/previews/008/959/114/original/green-neon-note-sign-on-a-black-background-vector.jpg",
-    "https://static.vecteezy.com/system/resources/thumbnails/012/939/577/small/pink-neon-note-sign-on-a-black-background-vector.jpg",
-    "https://st4.depositphotos.com/21557188/23279/v/450/depositphotos_232798686-stock-illustration-headphones-music-wave-min-volume.jpg",
-    "https://images.assetsdelivery.com/compings_v2/fokaspokas/fokaspokas1808/fokaspokas180802442.jpg",
-    "https://i.pinimg.com/736x/a8/0c/86/a80c86aca3d06da45f7934d9b571572a.jpg",
-    "https://www.shutterstock.com/shutterstock/videos/1109339305/thumb/4.jpg?ip=x480",
-    "https://i.pinimg.com/1200x/21/90/5d/21905dbb8598de8d025b29b04c0b1f5e.jpg"
+    "https://i.imgur.com/CJ09TQq.png",
+    "https://i.imgur.com/b5fsfMv.png",
+    "https://i.imgur.com/iAKvZfs.png",
+    "https://i.imgur.com/qBMF0fz.png",
+    "https://i.imgur.com/OGFu1Le.png",
+    "https://i.imgur.com/iEUHvIc.png",
+    "https://i.imgur.com/14w5V4V.png",
+    "https://i.imgur.com/U0aP5pi.png",
+    "https://i.imgur.com/ZbZ7sqd.png",
+    "https://i.imgur.com/Y6GtKc3.png",
+    "https://i.imgur.com/vxsTh2E.png",
+    "https://i.imgur.com/nttMAYw.png",
+    "https://i.imgur.com/lkUVei7.png",
+    "https://i.imgur.com/MENQtiW.png",
+    "https://i.imgur.com/GXPMynI.png",
+    "https://i.imgur.com/Mlj0CoI.png",
+    "https://i.imgur.com/NmYfUe8.png",
+    "https://i.imgur.com/Mz5cEJR.png",
+    "https://i.imgur.com/IVHM0uZ.png"
     ];
     
    function resizeCanvas() {
