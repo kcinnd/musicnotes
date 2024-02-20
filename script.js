@@ -82,16 +82,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Push the note data with actual dimensions and loaded image
             notesData.push({
-                img: img,
-                x: x,
-                y: y,
-                width: img.width,
-                height: img.height,
-                revealed: false
-            });
-        };
-    });
-}
+            img: img,
+            x: x,
+            y: y,
+            width: img.width,
+            height: img.height,
+            revealed: false,
+            revealProgress: 0 // Add reveal progress property
+        });
+    };
+});
 
     function redrawCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -120,22 +120,41 @@ document.addEventListener('DOMContentLoaded', function() {
         litAreas.push({ x, y, color: selectedColor });
 
         notesData.forEach(note => {
-            if (!note.revealed && Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2)) <= beamRadius) {
+        const distance = Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2));
+        if (distance <= beamRadius) {
+            note.revealProgress += 20; // Increase reveal progress
+            if (note.revealProgress >= 100) { // Check for full reveal
                 note.revealed = true;
             }
-        });
-
-        redrawCanvas();
-    }
-
-    canvas.addEventListener('click', function(event) {
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        createGlow(x, y);
+        }
     });
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas(); // Sets initial canvas size
-    preloadNotes(); // Preloads note images
+    redrawCanvas();
+ }
+ function redrawCanvas() {
+    // Existing canvas redrawing code...
+
+    notesData.forEach(note => {
+        if (note.revealProgress > 0) {
+            const opacity = Math.min(note.revealProgress / 100, 1); // Calculate opacity based on reveal progress
+            ctx.globalAlpha = opacity; // Apply opacity
+            ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
+            ctx.globalAlpha = 1.0; // Reset opacity
+        }
+    });
+}
+
+// 4. Handle Clicks on Notes
+canvas.addEventListener('click', function(event) {
+    // Convert click coordinates to canvas space
+    const x = event.clientX - canvas.getBoundingClientRect().left;
+    const y = event.clientY - canvas.getBoundingClientRect().top;
+
+    notesData.forEach(note => {
+        // Check if click is within a fully revealed note
+        if (note.revealed && x >= note.x && x <= note.x + note.width && y >= note.y && y <= note.y + note.height) {
+            // Play the associated song
+            console.log("Playing song for note:", note);
+        }
+    });
 });
