@@ -63,26 +63,32 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    for (let i = 0; i < noteImages.length; i++) {
+    for (let i = 0; i < 19; i++) {
         let note = document.createElement('div');
         note.className = 'music-note';
-        note.style.backgroundImage = `url('${noteImages[i]}')`;
-        let randomX = Math.random() * (canvas.width - 50); // Adjust for image size
+        note.style.backgroundImage = `url('${noteImages[i % noteImages.length]}')`; // Use modulo for cycling through images
+        let randomX = Math.random() * (canvas.width - 50); // Assuming 50px is the max size of a note
         let randomY = Math.random() * (canvas.height - 50);
         note.style.left = `${randomX}px`;
         note.style.top = `${randomY}px`;
         container.appendChild(note);
-        notesData.push({ element: note, x: randomX, y: randomY, uncovered: false });
+
+        notesData.push({
+            element: note,
+            x: randomX,
+            y: randomY,
+            uncovered: false
+        });
     }
 
     function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-        let gradient = ctx.createRadialGradient(x, y, 1, x, y, 50);
-        gradient.addColorStop(0, selectedColor[0]);
-        gradient.addColorStop(1, selectedColor[1]);
+        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 50);
+        gradient.addColorStop(0, selectedColor[0]); // Bright center
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Fading to transparent
 
         ctx.beginPath();
-        ctx.arc(x, y, 50, 0, Math.PI * 2);
+        ctx.arc(x, y, 50, 0, 2 * Math.PI);
         ctx.fillStyle = gradient;
         ctx.fill();
     }
@@ -95,11 +101,10 @@ document.addEventListener('DOMContentLoaded', function() {
         notesData.forEach(note => {
             if (Math.abs(x - note.x) < 20 && Math.abs(y - note.y) < 20 && !note.uncovered) {
                 note.element.style.visibility = 'visible';
-                note.uncovered = true; // Mark the note as uncovered
+                note.uncovered = true;
             }
         });
 
-        createGlow(x, y); // Create the glow effect
+        createGlow(x, y);
     });
 });
-
