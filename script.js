@@ -22,24 +22,28 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', resizeCanvas);
 
     // Function to create a glow effect and optionally clear the overlay
-    function createGlow(x, y, clearOverlay = false) {
-        ctx.beginPath();
-        ctx.arc(x, y, 20, 0, Math.PI * 2, false);
-        ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'; // Semi-transparent yellow for the glow
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = 'yellow';
+ function createGlow(x, y, clearOverlay = false) {
+    // Create a radial gradient for the glow effect
+    let gradient = ctx.createRadialGradient(x, y, 1, x, y, 20);
+    gradient.addColorStop(0, 'rgba(255, 255, 224, 0.8)'); // Bright center
+    gradient.addColorStop(0.4, 'rgba(255, 255, 224, 0.6)'); // Fading yellow
+    gradient.addColorStop(1, 'rgba(255, 255, 224, 0)'); // Transparent outer edge
 
-        if (clearOverlay) {
-            ctx.globalCompositeOperation = 'destination-out'; // Clear the overlay to reveal notes
-            ctx.fill();
-            ctx.globalCompositeOperation = 'destination-over'; // Draw the glow beneath the overlay
-        }
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2, false);
+    ctx.fillStyle = gradient;
 
-        ctx.fill(); // Draw the glow
-
-        // Reset shadowBlur for future drawings
-        ctx.shadowBlur = 0;
+    if (clearOverlay) {
+        ctx.globalCompositeOperation = 'destination-out'; // Clear the overlay to reveal notes
+        ctx.fill();
+        ctx.globalCompositeOperation = 'destination-over'; // Draw the glow beneath the overlay
     }
+
+    ctx.fill(); // Draw the glow
+
+    // Reset shadowBlur for future drawings
+    ctx.shadowBlur = 0;
+}
 
     for (let i = 1; i <= 19; i++) {
         let note = document.createElement('div');
