@@ -97,24 +97,31 @@ document.addEventListener('DOMContentLoaded', function() {
     function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, selectedColor[0]);
+        gradient.addColorStop(0, selectedColor);
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
+        // Clear only the beam area to simulate revealing
+        ctx.globalCompositeOperation = 'destination-out';
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
+        ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
         ctx.fill();
 
+        ctx.globalCompositeOperation = 'source-over';
+
+        // Reveal notes if they are in the beam area
         notesData.forEach(note => {
-            const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
-            if (distance < beamRadius && !note.revealed) {
-                note.revealed = true; // Only reveal the note if the beam directly overlaps with it
+            if (Math.hypot(note.x + img.width / 2 - x, note.y + img.height / 2 - y) <= beamRadius) {
+                note.revealed = true;
             }
         });
 
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawNotes(); // Redraw all revealed notes
+        // Redraw the notes to ensure they are visible if revealed
+        notesData.forEach(note => {
+            if (note.revealed) {
+                ctx.drawImage(note.img, note.x, note.y);
+            }
+        });
     }
 
     canvas.addEventListener('click', function(event) {
@@ -125,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     window.addEventListener('resize', resizeCanvas);
-
     resizeCanvas();
     preloadNotes();
 });
