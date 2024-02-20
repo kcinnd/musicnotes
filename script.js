@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const notesData = []; // Array to hold data for each note
     const litAreas = []; // Array to track lit areas
     const beamRadius = 50; // Radius of the flashlight beam
-    const noteSize = 50; // Fixed size for the notes
     
     const beamColors = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
@@ -88,22 +87,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function redrawCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height); // Redraw the black background
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Redraw all lit areas with their assigned colors
         litAreas.forEach(area => {
             const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
             gradient.addColorStop(0, area.color[0]);
-            gradient.addColorStop(1, area.color[1]);
+            gradient.addColorStop(0.9, area.color[0]);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = gradient;
             ctx.beginPath();
             ctx.arc(area.x, area.y, beamRadius, 0, 2 * Math.PI);
             ctx.fill();
         });
 
-        // Redraw all revealed notes
         notesData.forEach(note => {
             if (note.revealed) {
                 ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
@@ -113,42 +111,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-        litAreas.push({ x, y, color: selectedColor }); // Assign a color to the new lit area
+        litAreas.push({ x, y, color: selectedColor });
 
-        // Reveal notes if they are within the new lit area
         notesData.forEach(note => {
             if (!note.revealed && Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2)) <= beamRadius) {
                 note.revealed = true;
             }
         });
 
-        redrawCanvas(); // Redraw the canvas with the new lit area and any newly revealed notes
+        redrawCanvas();
     }
-    
-    function redrawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height); // Redraw the black background
-
-    // Redraw all lit areas with their assigned colors
-    litAreas.forEach(area => {
-        const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
-        gradient.addColorStop(0, area.color[0]);
-        gradient.addColorStop(0.9, area.color[0]); // Extend the solid color further out
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Sharp transition to transparent
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(area.x, area.y, beamRadius, 0, 2 * Math.PI);
-        ctx.fill();
-    });
-
-    // Redraw all revealed notes
-    notesData.forEach(note => {
-        if (note.revealed) {
-            ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
-        }
-    });
-}
 
     canvas.addEventListener('click', function(event) {
         const rect = canvas.getBoundingClientRect();
@@ -158,7 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     window.addEventListener('resize', resizeCanvas);
-
-    resizeCanvas(); // Initial setup
-    preloadNotes(); // Load note images and set up their positions
+    resizeCanvas();
+    preloadNotes();
 });
