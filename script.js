@@ -94,11 +94,10 @@ document.addEventListener('DOMContentLoaded', function() {
         litAreas.forEach(area => {
             const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
             gradient.addColorStop(0, area.color[0]);
-            gradient.addColorStop(0.9, area.color[0]);
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            gradient.addColorStop(1, area.color[1]);
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(area.x, area.y, beamRadius, 0, 2 * Math.PI);
+            ctx.arc(area.x, area.y, beamRadius, 0, Math.PI * 2);
             ctx.fill();
         });
 
@@ -108,18 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    function drawFlashlightBeam(x, y) {
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, flashlightColor);
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
-        ctx.fill();
-    }
 
     function createGlow(x, y) {
-        litAreas.push({ x, y });  // Store the center of the new beam
+        const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
+        litAreas.push({ x, y, color: selectedColor });
 
         notesData.forEach(note => {
             if (!note.revealed && Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2)) <= beamRadius) {
@@ -138,6 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    preloadNotes();
+    resizeCanvas(); // Sets initial canvas size
+    preloadNotes(); // Preloads note images
 });
