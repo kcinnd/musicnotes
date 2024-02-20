@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('container');
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
+    const notesData = [];
     const beamColors = [
     // Existing colors...
     ['rgba(255, 0, 0, 0.8)', 'rgba(255, 0, 0, 0)'], // Red
@@ -62,12 +63,23 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Function to create a glow effect and optionally clear the overlay
-function createGlow(x, y) {
+    for (let i = 0; i < noteImages.length; i++) {
+        let note = document.createElement('div');
+        note.className = 'music-note';
+        note.style.backgroundImage = `url('${noteImages[i]}')`;
+        let randomX = Math.random() * (canvas.width - 50); // Adjust for image size
+        let randomY = Math.random() * (canvas.height - 50);
+        note.style.left = `${randomX}px`;
+        note.style.top = `${randomY}px`;
+        container.appendChild(note);
+        notesData.push({ element: note, x: randomX, y: randomY, uncovered: false });
+    }
+
+    function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         let gradient = ctx.createRadialGradient(x, y, 1, x, y, 50);
-        gradient.addColorStop(0, selectedColor[0]); // Intense color at the center
-        gradient.addColorStop(1, selectedColor[1]); // Fade to transparent
+        gradient.addColorStop(0, selectedColor[0]);
+        gradient.addColorStop(1, selectedColor[1]);
 
         ctx.beginPath();
         ctx.arc(x, y, 50, 0, Math.PI * 2);
@@ -75,14 +87,10 @@ function createGlow(x, y) {
         ctx.fill();
     }
 
-    // Listen for clicks on the canvas to create the flashlight beam effect
     canvas.addEventListener('mousedown', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        createGlow(x, y);
-    });
-
 
         notesData.forEach(note => {
             if (Math.abs(x - note.x) < 20 && Math.abs(y - note.y) < 20 && !note.uncovered) {
@@ -91,6 +99,7 @@ function createGlow(x, y) {
             }
         });
 
-        createGlow(x, y, true); // Create the glow effect and clear the overlay
+        createGlow(x, y); // Create the glow effect
     });
 });
+
