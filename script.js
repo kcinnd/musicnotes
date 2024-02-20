@@ -130,9 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
         createGlow(x, y);
     });
 
-    // Resize the canvas to fill the browser window dynamically
     window.addEventListener('resize', resizeCanvas);
-
-    // Initial canvas setup
-    resizeCanvas();
+    resizeCanvas(); // Initial setup
 });
