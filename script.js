@@ -124,6 +124,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
         redrawCanvas(); // Redraw the canvas with the new lit area and any newly revealed notes
     }
+    
+    function redrawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Redraw the black background
+
+    // Redraw all lit areas with their assigned colors
+    litAreas.forEach(area => {
+        const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
+        gradient.addColorStop(0, area.color[0]);
+        gradient.addColorStop(0.9, area.color[0]); // Extend the solid color further out
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Sharp transition to transparent
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(area.x, area.y, beamRadius, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+
+    // Redraw all revealed notes
+    notesData.forEach(note => {
+        if (note.revealed) {
+            ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
+        }
+    });
+}
 
     canvas.addEventListener('click', function(event) {
         const rect = canvas.getBoundingClientRect();
