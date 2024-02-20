@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('container');
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
-    const notesData = [];
+    const notesData = []; // Array to hold data for each note
     const beamColors = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
     ['rgba(189, 0, 255, 1)', 'rgba(189, 0, 255, 0)'],
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ['rgba(75, 0, 130, 1)', 'rgba(75, 0, 130, 0)'],
     ['rgba(252, 142, 172, 1)', 'rgba(252, 142, 172, 0)'],
     ['rgba(0, 255, 195, 1)', 'rgba(0, 255, 195, 0)']
-];
+    ];
     
     // Array of music note image URLs
     const noteImages = [
@@ -61,56 +61,49 @@ document.addEventListener('DOMContentLoaded', function() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // Create and position music notes, then store their data in notesData
     for (let i = 0; i < 19; i++) {
         let note = document.createElement('div');
         note.className = 'music-note';
-        note.style.backgroundImage = `url('${noteImages[i % noteImages.length]}')`; // Use modulo for cycling through images
+        note.style.backgroundImage = `url('${noteImages[i % noteImages.length]}')`;
         let randomX = Math.random() * (canvas.width - 50); // Assuming 50px is the max size of a note
         let randomY = Math.random() * (canvas.height - 50);
         note.style.left = `${randomX}px`;
         note.style.top = `${randomY}px`;
         container.appendChild(note);
 
-        notesData.push({
-            element: note,
-            x: randomX,
-            y: randomY,
-            uncovered: false
-        });
+        notesData.push({ element: note, x: randomX, y: randomY, uncovered: false });
     }
 
+    // Function to create a glow effect with a realistic flashlight beam
     function createGlow(x, y) {
-    const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 100); // Increase radius for wider beam
+        const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
+        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
 
-    // Intense center
-    gradient.addColorStop(0, selectedColor.replace('0.8', '1')); // Increase opacity for center
+        gradient.addColorStop(0, selectedColors[0]); // Intense center
+        gradient.addColorStop(0.6, selectedColors[0].replace('1)', '0.2)')); // Softer edge
+        gradient.addColorStop(1, selectedColors[1]); // Transparent edge
 
-    // Slightly softer edge
-    gradient.addColorStop(0.4, selectedColor); // Original color
-
-    // Soft outer edge, transitioning to transparency
-    gradient.addColorStop(1, selectedColor.replace('0.8', '0')); // Transparent edge
-
-    ctx.beginPath();
-    ctx.arc(x, y, 100, 0, 2 * Math.PI);
-    ctx.fillStyle = gradient;
-    ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, y, 100, 0, 2 * Math.PI);
+        ctx.fillStyle = gradient;
+        ctx.fill();
     }
-    
-   canvas.addEventListener('mousedown', function(event) {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
 
-    notesData.forEach(note => {
-        let distance = Math.sqrt(Math.pow(x - note.x - 25, 2) + Math.pow(y - note.y - 25, 2)); // Adjust for note size
-        if (distance < 50 && !note.uncovered) { // 50px radius for detection, adjust as needed
-            note.element.style.visibility = 'visible';
-            note.uncovered = true;
-        }
+    // Event listener for mouse clicks on the canvas to reveal notes and create glow
+    canvas.addEventListener('mousedown', function(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        notesData.forEach(note => {
+            let distance = Math.sqrt(Math.pow(x - (note.x + 25), 2) + Math.pow(y - (note.y + 25), 2)); // Center of note
+            if (distance < 50 && !note.uncovered) { // Click within 50px radius of note center
+                note.element.style.visibility = 'visible';
+                note.uncovered = true;
+            }
+        });
+
+        createGlow(x, y);
     });
-
-    createGlow(x, y);
 });
-    
