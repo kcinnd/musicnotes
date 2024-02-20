@@ -1,16 +1,47 @@
+function lightUp(x, y) {
+  let light = document.createElement('div');
+  light.style.position = 'absolute';
+  light.style.left = `${x - 25}px`; // Centering the light-up effect
+  light.style.top = `${y - 25}px`;
+  light.style.width = '50px';
+  light.style.height = '50px';
+  light.style.borderRadius = '50%';
+  light.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent white
+  document.getElementById('container').appendChild(light);
+}
+
+const notes = [
+  { id: 'note1', x: 100, y: 150 },
+  { id: 'note2', x: 200, y: 250 },
+  { id: 'note3', x: 300, y: 350 },
+  { id: 'note4', x: 400, y: 450 },
+  { id: 'note5', x: 500, y: 100 },
+  { id: 'note6', x: 600, y: 200 },
+  { id: 'note7', x: 700, y: 300 },
+  { id: 'note8', x: 800, y: 400 },
+  { id: 'note9', x: 900, y: 500 },
+  { id: 'note10', x: 150, y: 550 },
+  { id: 'note11', x: 250, y: 650 },
+  { id: 'note12', x: 350, y: 750 },
+  { id: 'note13', x: 450, y: 850 },
+  { id: 'note14', x: 550, y: 950 },
+  { id: 'note15', x: 650, y: 1050 },
+  { id: 'note16', x: 750, y: 1150 },
+  { id: 'note17', x: 850, y: 1250 },
+  { id: 'note18', x: 950, y: 1350 },
+  { id: 'note19', x: 1050, y: 1450 }
+];
+
 document.getElementById('container').addEventListener('click', function(event) {
-  // Determine the clicked position
   let x = event.pageX - this.offsetLeft;
   let y = event.pageY - this.offsetTop;
+  lightUp(x, y);
 
-  // Optionally, create a "lit-up" effect around the clicked area
-  // This could involve drawing a semi-transparent circle or changing the area's background
-
-  // Check if a music note is at the clicked position
-  // This part requires a predefined mapping of the music notes' positions
-  // For simplicity, this example just checks one note
-  if (/* condition to check if a note is at (x, y) */) {
-    // If a note is found, reveal it
-    document.getElementById('note1').style.display = 'block'; // Assuming 'note1' is at the clicked position
-  }
+  notes.forEach(note => {
+    let dx = Math.abs(x - note.x);
+    let dy = Math.abs(y - note.y);
+    if (dx < 20 && dy < 20) { // Threshold for "close enough"
+      document.getElementById(note.id).style.display = 'block';
+    }
+  });
 });
