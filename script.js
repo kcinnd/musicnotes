@@ -4,28 +4,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = canvas.getContext('2d');
     const notesData = [];
     const beamColors = [
-    // Existing colors...
-    ['rgba(255, 0, 0, 0.8)', 'rgba(255, 0, 0, 0)'], // Red
-    ['rgba(255, 105, 180, 0.8)', 'rgba(255, 105, 180, 0)'], // Neon Pink
-    ['rgba(255, 165, 0, 0.8)', 'rgba(255, 165, 0, 0)'], // Neon Orange
-    ['rgba(255, 255, 0, 0.8)', 'rgba(255, 255, 0, 0)'], // Neon Yellow
-    ['rgba(0, 255, 0, 0.8)', 'rgba(0, 255, 0, 0)'], // Neon Green
-    ['rgba(0, 255, 255, 0.8)', 'rgba(0, 255, 255, 0)'], // Neon Cyan
-    ['rgba(75, 0, 130, 0.8)', 'rgba(75, 0, 130, 0)'], // Indigo
-    ['rgba(238, 130, 238, 0.8)', 'rgba(238, 130, 238, 0)'], // Violet
-    // Additional new colors
-    ['rgba(64, 224, 208, 0.8)', 'rgba(64, 224, 208, 0)'], // Turquoise
-    ['rgba(255, 69, 0, 0.8)', 'rgba(255, 69, 0, 0)'], // Red-Orange
-    ['rgba(255, 215, 0, 0.8)', 'rgba(255, 215, 0, 0)'], // Gold
-    ['rgba(0, 100, 0, 0.8)', 'rgba(0, 100, 0, 0)'], // Dark Green
-    ['rgba(106, 90, 205, 0.8)', 'rgba(106, 90, 205, 0)'], // Slate Blue
-    ['rgba(72, 209, 204, 0.8)', 'rgba(72, 209, 204, 0)'], // Medium Turquoise
-    ['rgba(147, 112, 219, 0.8)', 'rgba(147, 112, 219, 0)'], // Medium Purple
-    ['rgba(255, 20, 147, 0.8)', 'rgba(255, 20, 147, 0)'], // Deep Pink
-    ['rgba(255, 140, 0, 0.8)', 'rgba(255, 140, 0, 0)'], // Dark Orange
-    ['rgba(0, 191, 255, 0.8)', 'rgba(0, 191, 255, 0)'], // Deep Sky Blue
-    ['rgba(220, 20, 60, 0.8)', 'rgba(220, 20, 60, 0)'] // Crimson
-    ];
+    ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
+    ['rgba(189, 0, 255, 1)', 'rgba(189, 0, 255, 0)'],
+    ['rgba(0, 145, 255, 1)', 'rgba(0, 145, 255, 0)'],
+    ['rgba(0, 255, 25, 1)', 'rgba(0, 255, 25, 0)'],
+    ['rgba(255, 0, 110, 1)', 'rgba(255, 0, 110, 0)'],
+    ['rgba(255, 255, 0, 1)', 'rgba(255, 255, 0, 0)'],
+    ['rgba(0, 255, 255, 1)', 'rgba(0, 255, 255, 0)'],
+    ['rgba(255, 165, 0, 1)', 'rgba(255, 165, 0, 0)'],
+    ['rgba(204, 51, 255, 1)', 'rgba(204, 51, 255, 0)'],
+    ['rgba(191, 255, 0, 1)', 'rgba(191, 255, 0, 0)'],
+    ['rgba(64, 224, 208, 1)', 'rgba(64, 224, 208, 0)'],
+    ['rgba(255, 0, 255, 1)', 'rgba(255, 0, 255, 0)'],
+    ['rgba(255, 215, 0, 1)', 'rgba(255, 215, 0, 0)'],
+    ['rgba(148, 0, 211, 1)', 'rgba(148, 0, 211, 0)'],
+    ['rgba(135, 206, 235, 1)', 'rgba(135, 206, 235, 0)'],
+    ['rgba(255, 111, 97, 1)', 'rgba(255, 111, 97, 0)'],
+    ['rgba(75, 0, 130, 1)', 'rgba(75, 0, 130, 0)'],
+    ['rgba(252, 142, 172, 1)', 'rgba(252, 142, 172, 0)'],
+    ['rgba(0, 255, 195, 1)', 'rgba(0, 255, 195, 0)']
+];
     
     // Array of music note image URLs
     const noteImages = [
@@ -83,16 +81,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createGlow(x, y) {
     const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
-    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 100); // Increase the outer radius for a wider beam
-    gradient.addColorStop(0, selectedColor[0]); // Bright center
-    gradient.addColorStop(0.2, selectedColor[0].replace('0.8', '0.6')); // Slightly less intense
-    gradient.addColorStop(0.8, 'rgba(0, 0, 0, 0)'); // Gradual fade to transparent
+    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 100); // Increase radius for wider beam
+
+    // Intense center
+    gradient.addColorStop(0, selectedColor.replace('0.8', '1')); // Increase opacity for center
+
+    // Slightly softer edge
+    gradient.addColorStop(0.4, selectedColor); // Original color
+
+    // Soft outer edge, transitioning to transparency
+    gradient.addColorStop(1, selectedColor.replace('0.8', '0')); // Transparent edge
 
     ctx.beginPath();
-    ctx.arc(x, y, 100, 0, 2 * Math.PI); // Match the outer radius of the gradient
+    ctx.arc(x, y, 100, 0, 2 * Math.PI);
     ctx.fillStyle = gradient;
     ctx.fill();
-}
+    }
     
    canvas.addEventListener('mousedown', function(event) {
     const rect = canvas.getBoundingClientRect();
