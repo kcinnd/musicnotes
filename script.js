@@ -48,76 +48,53 @@ document.addEventListener('DOMContentLoaded', function() {
     "https://i.imgur.com/IVHM0uZ.png"
     ];
     
-   function resizeCanvas() {
+  function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    function isTooClose(x, y, minDistance) {
-        return notesData.some(note => {
-            const dx = x - note.x;
-            const dy = y - note.y;
-            return Math.sqrt(dx * dx + dy * dy) < minDistance;
+    function drawNotes() {
+        noteImages.forEach((imageSrc, index) => {
+            const noteImage = new Image();
+            noteImage.src = imageSrc;
+            noteImage.onload = () => {
+                const x = Math.random() * (canvas.width - 50); // Assuming a note size for simplicity
+                const y = Math.random() * (canvas.height - 50);
+                ctx.drawImage(noteImage, x, y, 50, 50); // Drawing the note with a fixed size
+                notesData.push({ image: noteImage, x, y, width: 50, height: 50, revealed: false });
+            };
         });
     }
 
-    for (let i = 0; i < 19; i++) {
-        let note, randomX, randomY, tooClose;
-        do {
-            note = document.createElement('div');
-            note.className = 'music-note';
-            randomX = Math.random() * (canvas.width - 50);
-            randomY = Math.random() * (canvas.height - 50);
-            tooClose = isTooClose(randomX, randomY, 50);
-        } while (tooClose);
-
-        note.style.left = `${randomX}px`;
-        note.style.top = `${randomY}px`;
-        note.style.backgroundImage = `url('${noteImages[i % noteImages.length]}')`;
-        container.appendChild(note);
-
-        // Add coverage property here
-        notesData.push({ element: note, x: randomX, y: randomY, uncovered: false, coverage: 0 });
-    }
-
-    function createGlow(x, y) {
-        const beamRadius = 75; // Define beam radius
-        const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
-        let gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-
-        gradient.addColorStop(0, selectedColors[0]);
-        gradient.addColorStop(0.6, selectedColors[1]);
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
+    function revealWithBeam(x, y) {
+        const beamRadius = 30; // Adjust the beam size as needed
+        ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
-        ctx.fillStyle = gradient;
+        ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
         ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+
+        // Check if the beam reveals any notes and update their 'revealed' status
+        notesData.forEach(note => {
+            if (!note.revealed && x >= note.x && x <= note.x + note.width && y >= note.y && y <= note.y + note.height) {
+                note.revealed = true;
+                // You can add logic here to handle a fully revealed note, such as making it clickable
+            }
+        });
     }
+
+    resizeCanvas(); // Set up the initial canvas size
+    drawNotes(); // Draw the notes on the canvas
 
     canvas.addEventListener('mousedown', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-
-        notesData.forEach(note => {
-            let distance = Math.sqrt(Math.pow(x - (note.x + 25), 2) + Math.pow(y - (note.y + 25), 2));
-            if (distance < 75 && !note.uncovered) { // Use beamRadius if defined outside
-                note.coverage += 1;
-                if (note.coverage > 10) { // Threshold to fully reveal the note
-                    note.element.style.visibility = 'visible';
-                    note.uncovered = true;
-                    note.element.addEventListener('click', function() {
-                        // Logic to play music here
-                    });
-                }
-            }
-        });
+        revealWithBeam(x, y); // Use the beam to reveal parts of the notes
+    });
+});
 
         createGlow(x, y);
     });
