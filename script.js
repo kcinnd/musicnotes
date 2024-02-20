@@ -2,17 +2,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('container');
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
+    const notesData = [];
 
-    // Loop to position each music note randomly within the container
     for (let i = 1; i <= 19; i++) {
         let note = document.getElementById(`note${i}`);
-        let randomX = Math.floor(Math.random() * (containerWidth - 20)); // Assuming note width of 20px
-        let randomY = Math.floor(Math.random() * (containerHeight - 20)); // Assuming note height of 20px
+        let randomX = Math.floor(Math.random() * (containerWidth - note.offsetWidth));
+        let randomY = Math.floor(Math.random() * (containerHeight - note.offsetHeight));
 
         note.style.left = `${randomX}px`;
         note.style.top = `${randomY}px`;
-        note.style.display = 'block';
+        note.style.visibility = 'hidden'; // Start with the note hidden
+        notesData.push({
+            element: note,
+            x: randomX,
+            y: randomY,
+            audio: new Audio('path/to/your/audio/note' + i + '.mp3') // Update path as needed
+        });
     }
+    
+    container.addEventListener('click', function(event) {
+        let x = event.pageX - this.offsetLeft;
+        let y = event.pageY - this.offsetTop;
+
+        // Light-up effect for the clicked area
+        lightUp(x, y);
+
+        // Check if any note is close to the clicked position
+        notesData.forEach(note => {
+            if (Math.abs(x - note.x) < 20 && Math.abs(y - note.y) < 20) { // Threshold for detecting click near note
+                note.element.style.visibility = 'visible'; // Make the note visible
+                // Toggle audio playback
+                if (note.audio.paused) {
+                    note.audio.play();
+                } else {
+                    note.audio.pause();
+                    note.audio.currentTime = 0; // Reset audio to start
+                }
+            }
+        });
+    });
 });
 
 function lightUp(x, y) {
