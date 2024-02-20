@@ -14,7 +14,7 @@ body, html {
   position: absolute;
   width: 20px; /* Adjust based on your note image size */
   height: 20px;
-  background-image: url('https://i.imgur.com/fThpcNc.png'); /* Music note image */
+  background-image: url('https://i.imgur.com/fThpcNc.png');
   background-size: cover;
-  /* Initially visible for positioning, can be hidden and then revealed on click */
+  visibility: hidden; /* Initially hidden */
 }
