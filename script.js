@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createGlow(x, y) {
         const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
-        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 50); // Reduced radius for a smaller beam
+        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 75); // Reduced radius for a smaller beam
 
         gradient.addColorStop(0, selectedColors[0]); // Intense center
         gradient.addColorStop(0.6, selectedColors[1]); // Softer edge
