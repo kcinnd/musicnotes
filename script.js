@@ -60,45 +60,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Preload images and store note data without drawing them
    
    noteImages.forEach(src => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => {
-            let x, y, overlaps;
-            do {
-                // Adjust x and y to ensure the entire note is within the canvas
-                x = Math.random() * (canvas.width - img.width);
-                y = Math.random() * (canvas.height - img.height);
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                let x, y, overlaps;
+                do {
+                    x = Math.random() * (canvas.width - img.width);
+                    y = Math.random() * (canvas.height - img.height);
+                    overlaps = notesData.some(note => {
+                        const dx = note.x - x;
+                        const dy = note.y - y;
+                        return Math.sqrt(dx * dx + dy * dy) < beamRadius; // Adjusted for beam radius
+                    });
+                } while (overlaps);
 
-                // Check for overlaps using the actual dimensions of the loaded image
-                overlaps = notesData.some(note => {
-                    const dx = note.x - x;
-                    const dy = note.y - y;
-                    // Use a simpler overlap check, like bounding box intersection
-                    const distanceX = Math.abs(dx) - (img.width + note.width) / 2;
-                    const distanceY = Math.abs(dy) - (img.height + note.height) / 2;
-                    return distanceX < 0 && distanceY < 0;
+                notesData.push({
+                    img: img,
+                    x: x,
+                    y: y,
+                    width: img.width,
+                    height: img.height,
+                    revealed: false,
+                    revealProgress: 0,
+                    audio: new Audio('https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3') // Assuming you have corresponding audio files
                 });
-            } while (overlaps);
-
-            // Push the note data with actual dimensions and loaded image
-            notesData.push({
-            img: img,
-            x: x,
-            y: y,
-            width: img.width,
-            height: img.height,
-            revealed: false,
-            revealProgress: 0 // Add reveal progress property
+            };
         });
-    };
-});
+    }
 
     function redrawCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        litAreas.forEach(area => {
+       litAreas.forEach(area => {
             const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
             gradient.addColorStop(0, area.color[0]);
             gradient.addColorStop(1, area.color[1]);
@@ -109,52 +104,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         notesData.forEach(note => {
-            if (note.revealed) {
+            if (note.revealed || note.revealProgress > 0) {
+                const opacity = note.revealProgress / 100;
+                ctx.globalAlpha = opacity; // Use globalAlpha for partial transparency
                 ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
+                ctx.globalAlpha = 1.0; // Reset globalAlpha
             }
         });
     }
 
-    function createGlow(x, y) {
+   function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         litAreas.push({ x, y, color: selectedColor });
 
         notesData.forEach(note => {
-        const distance = Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2));
-        if (distance <= beamRadius) {
-            note.revealProgress += 20; // Increase reveal progress
-            if (note.revealProgress >= 100) { // Check for full reveal
-                note.revealed = true;
+            const distance = Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2));
+            if (distance <= beamRadius) {
+                note.revealProgress = Math.min(note.revealProgress + 20, 100); // Increment reveal progress
+                if (note.revealProgress >= 100) {
+                    note.revealed = true; // Mark as fully revealed
+                }
             }
-        }
+        });
+
+        redrawCanvas();
+    }
+
+    canvas.addEventListener('click', function(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        createGlow(x, y);
+
+        notesData.forEach(note => {
+            if (note.revealed) {
+                const noteRect = {
+                    left: note.x,
+                    right: note.x + note.width,
+                    top: note.y,
+                    bottom: note.y + note.height
+                };
+
+                if (x >= noteRect.left && x <= noteRect.right && y >= noteRect.top && y <= noteRect.bottom) {
+                    if (note.audio.paused) {
+                        note.audio.play();
+                    } else {
+                        note.audio.pause();
+                    }
+                }
+            }
+        });
     });
 
-    redrawCanvas();
- }
- function redrawCanvas() {
-    // Existing canvas redrawing code...
-
-    notesData.forEach(note => {
-        if (note.revealProgress > 0) {
-            const opacity = Math.min(note.revealProgress / 100, 1); // Calculate opacity based on reveal progress
-            ctx.globalAlpha = opacity; // Apply opacity
-            ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
-            ctx.globalAlpha = 1.0; // Reset opacity
-        }
-    });
-}
-
-// 4. Handle Clicks on Notes
-canvas.addEventListener('click', function(event) {
-    // Convert click coordinates to canvas space
-    const x = event.clientX - canvas.getBoundingClientRect().left;
-    const y = event.clientY - canvas.getBoundingClientRect().top;
-
-    notesData.forEach(note => {
-        // Check if click is within a fully revealed note
-        if (note.revealed && x >= note.x && x <= note.x + note.width && y >= note.y && y <= note.y + note.height) {
-            // Play the associated song
-            console.log("Playing song for note:", note);
-        }
-    });
+    window.addEventListener('resize', resizeCanvas);
+    preloadNotes(); // Make sure to call this function to start loading the notes
 });
