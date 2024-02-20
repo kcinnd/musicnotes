@@ -103,11 +103,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
-        notesData.forEach(note => {
-            let distance = Math.sqrt(Math.pow(x - (note.x + 25), 2) + Math.pow(y - (note.y + 25), 2));
-            if (distance < 50 && !note.uncovered) {
-                note.element.style.visibility = 'visible';
-                note.uncovered = true;
+    notesData.push({ element: note, x: randomX, y: randomY, uncovered: false, coverage: 0 });
+
+// In the event listener, instead of immediately revealing the note, increment its 'coverage'
+    notesData.forEach(note => {
+      let distance = Math.sqrt(Math.pow(x - (note.x + note.element.offsetWidth / 2), 2) + Math.pow(y - (note.y + note.element.offsetHeight / 2), 2));
+      if (distance < beamRadius && !note.uncovered) {
+        note.coverage += 1; // Increment coverage
+        if (note.coverage > 10) { // Threshold to fully reveal the note
+            note.element.style.visibility = 'visible';
+            note.uncovered = true;
+            // Add event listener to play music when the note is clicked
+            note.element.addEventListener('click', function() {
             }
         });
 
