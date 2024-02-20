@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const notesData = []; // Array to hold data for each note
     const beamRadius = 50; // Radius of the flashlight beam
     
-    const beamColor = [
+    const beamColors = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
     ['rgba(189, 0, 255, 1)', 'rgba(189, 0, 255, 0)'],
     ['rgba(0, 145, 255, 1)', 'rgba(0, 145, 255, 0)'],
