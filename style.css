@@ -23,7 +23,7 @@ body, html {
     position: absolute;
     width: 50px; // Adjust based on your desired size or image dimensions
     height: 50px;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     visibility: hidden; // Start hidden and become visible upon interaction
 }
