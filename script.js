@@ -3,7 +3,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
     const notesData = [];
-
+    const beamColors = [
+    ['rgba(255, 0, 0, 0.8)', 'rgba(255, 0, 0, 0)'], // Neon Red
+    ['rgba(255, 105, 180, 0.8)', 'rgba(255, 105, 180, 0)'], // Neon Pink
+    ['rgba(255, 165, 0, 0.8)', 'rgba(255, 165, 0, 0)'], // Neon Orange
+    ['rgba(255, 255, 0, 0.8)', 'rgba(255, 255, 0, 0)'], // Neon Yellow
+    ['rgba(0, 255, 0, 0.8)', 'rgba(0, 255, 0, 0)'], // Neon Green
+    ['rgba(0, 255, 255, 0.8)', 'rgba(0, 255, 255, 0)'], // Neon Cyan
+    ['rgba(0, 0, 255, 0.8)', 'rgba(0, 0, 255, 0)'], // Bright Blue
+    ['rgba(75, 0, 130, 0.8)', 'rgba(75, 0, 130, 0)'], // Indigo
+    ['rgba(238, 130, 238, 0.8)', 'rgba(238, 130, 238, 0)'], // Violet
+    ['rgba(255, 20, 147, 0.8)', 'rgba(255, 20, 147, 0)'], // Deep Pink
+];
+    
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -23,35 +35,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to create a glow effect and optionally clear the overlay
 function createGlow(x, y, clearOverlay = false) {
-    // Clear the area if needed to reveal any hidden notes beneath the canvas
     if (clearOverlay) {
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
         ctx.arc(x, y, 20, 0, Math.PI * 2, false);
         ctx.fill();
-        ctx.globalCompositeOperation = 'source-over'; // Reset the composite operation
+        ctx.globalCompositeOperation = 'source-over';
     }
 
-    // Create a radial gradient for the flashlight beam effect
-    let gradient = ctx.createRadialGradient(x, y, 1, x, y, 50); // Start small and spread out
-    gradient.addColorStop(0, 'rgba(255, 255, 224, 0.8)'); // Bright center
-    gradient.addColorStop(0.2, 'rgba(255, 255, 224, 0.6)'); // Less intense
-    gradient.addColorStop(0.5, 'rgba(255, 255, 224, 0.3)'); // Beginning to fade
-    gradient.addColorStop(0.8, 'rgba(255, 255, 224, 0.1)'); // Barely visible
-    gradient.addColorStop(1, 'rgba(255, 255, 224, 0)'); // Fully transparent at the edges
+    // Select a random color gradient for the flashlight beam
+    const selectedGradient = beamColors[Math.floor(Math.random() * beamColors.length)];
+    let gradient = ctx.createRadialGradient(x, y, 1, x, y, 50);
+    gradient.addColorStop(0, selectedGradient[0]); // Start color
+    gradient.addColorStop(1, selectedGradient[1]); // End color (transparent)
 
-    // Increase shadowBlur to enhance the glow effect
     ctx.shadowBlur = 25;
-    ctx.shadowColor = 'yellow';
+    ctx.shadowColor = selectedGradient[0]; // Use the start color for the shadow
 
-    // Draw the flashlight beam using the radial gradient
     ctx.beginPath();
-    ctx.arc(x, y, 50, 0, Math.PI * 2, false); // The outer radius of the gradient
+    ctx.arc(x, y, 50, 0, Math.PI * 2, false);
     ctx.fillStyle = gradient;
     ctx.fill();
 
-    // Reset shadowBlur for future drawings
-    ctx.shadowBlur = 0;
+    ctx.shadowBlur = 0; // Reset shadowBlur for future drawings
 }
 
     for (let i = 1; i <= 19; i++) {
