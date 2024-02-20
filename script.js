@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
             note.className = 'music-note';
             randomX = Math.random() * (canvas.width - 50);
             randomY = Math.random() * (canvas.height - 50);
-            tooClose = isTooClose(randomX, randomY, 50); // Adjust the minimum distance as needed
+            tooClose = isTooClose(randomX, randomY, 50);
         } while (tooClose);
 
         note.style.left = `${randomX}px`;
@@ -81,19 +81,21 @@ document.addEventListener('DOMContentLoaded', function() {
         note.style.backgroundImage = `url('${noteImages[i % noteImages.length]}')`;
         container.appendChild(note);
 
-        notesData.push({ element: note, x: randomX, y: randomY, uncovered: false });
+        // Add coverage property here
+        notesData.push({ element: note, x: randomX, y: randomY, uncovered: false, coverage: 0 });
     }
 
     function createGlow(x, y) {
+        const beamRadius = 75; // Define beam radius
         const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
-        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 75); // Reduced radius for a smaller beam
+        let gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
 
-        gradient.addColorStop(0, selectedColors[0]); // Intense center
-        gradient.addColorStop(0.6, selectedColors[1]); // Softer edge
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Transparent edge
+        gradient.addColorStop(0, selectedColors[0]);
+        gradient.addColorStop(0.6, selectedColors[1]);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         ctx.beginPath();
-        ctx.arc(x, y, 50, 0, 2 * Math.PI);
+        ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
         ctx.fillStyle = gradient;
         ctx.fill();
     }
@@ -103,18 +105,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
-    notesData.push({ element: note, x: randomX, y: randomY, uncovered: false, coverage: 0 });
-
-// In the event listener, instead of immediately revealing the note, increment its 'coverage'
-    notesData.forEach(note => {
-      let distance = Math.sqrt(Math.pow(x - (note.x + note.element.offsetWidth / 2), 2) + Math.pow(y - (note.y + note.element.offsetHeight / 2), 2));
-      if (distance < beamRadius && !note.uncovered) {
-        note.coverage += 1; // Increment coverage
-        if (note.coverage > 10) { // Threshold to fully reveal the note
-            note.element.style.visibility = 'visible';
-            note.uncovered = true;
-            // Add event listener to play music when the note is clicked
-            note.element.addEventListener('click', function() {
+        notesData.forEach(note => {
+            let distance = Math.sqrt(Math.pow(x - (note.x + 25), 2) + Math.pow(y - (note.y + 25), 2));
+            if (distance < 75 && !note.uncovered) { // Use beamRadius if defined outside
+                note.coverage += 1;
+                if (note.coverage > 10) { // Threshold to fully reveal the note
+                    note.element.style.visibility = 'visible';
+                    note.uncovered = true;
+                    note.element.addEventListener('click', function() {
+                        // Logic to play music here
+                    });
+                }
             }
         });
 
