@@ -60,42 +60,51 @@ document.addEventListener('DOMContentLoaded', function() {
             const noteImage = new Image();
             noteImage.src = imageSrc;
             noteImage.onload = () => {
-                const x = Math.random() * (canvas.width - 50); // Assuming a note size for simplicity
+                const x = Math.random() * (canvas.width - 50);
                 const y = Math.random() * (canvas.height - 50);
-                ctx.drawImage(noteImage, x, y, 50, 50); // Drawing the note with a fixed size
+                ctx.drawImage(noteImage, x, y, 50, 50);
                 notesData.push({ image: noteImage, x, y, width: 50, height: 50, revealed: false });
             };
         });
     }
 
     function revealWithBeam(x, y) {
-        const beamRadius = 30; // Adjust the beam size as needed
+        const beamRadius = 30;
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
         ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
-
-        // Check if the beam reveals any notes and update their 'revealed' status
-        notesData.forEach(note => {
-            if (!note.revealed && x >= note.x && x <= note.x + note.width && y >= note.y && y <= note.y + note.height) {
-                note.revealed = true;
-                // You can add logic here to handle a fully revealed note, such as making it clickable
-            }
-        });
     }
 
-    resizeCanvas(); // Set up the initial canvas size
-    drawNotes(); // Draw the notes on the canvas
+    function isNoteRevealed(note) {
+        // Placeholder for a function that determines if a note is sufficiently revealed
+        // This could be a complex function depending on how you define "sufficiently revealed"
+        return note.revealed; // Simple example based on a 'revealed' flag
+    }
+
+    function onNoteClick(note) {
+        // Placeholder for what happens when a note is clicked
+        console.log('Note clicked:', note);
+        // Here you would typically play the note's associated sound or trigger other actions
+    }
 
     canvas.addEventListener('mousedown', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        revealWithBeam(x, y); // Use the beam to reveal parts of the notes
-    });
-});
+        revealWithBeam(x, y);
 
-        createGlow(x, y);
+        // Check if the click is within the bounding box of any note
+        notesData.forEach(note => {
+            if (x >= note.x && x <= note.x + note.width && y >= note.y && y <= note.y + note.height) {
+                if (isNoteRevealed(note)) {
+                    onNoteClick(note);
+                }
+            }
+        });
     });
+
+    resizeCanvas();
+    drawNotes();
 });
