@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
         canvas.height = window.innerHeight;
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawNotes(); // Redraw notes on canvas resize to ensure they remain visible
     }
 
-    // Function to preload note images and associate them with positions and audio files
     function preloadNotes() {
         const noteImages = [
     "https://i.imgur.com/CJ09TQq.png",
