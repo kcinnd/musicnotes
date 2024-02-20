@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let x = event.pageX - this.offsetLeft;
         let y = event.pageY - this.offsetTop;
 
-        lightUp(x, y); // Light-up effect for the clicked area
+        lightUp(x, y); // Restore the light-up effect for the clicked area
 
         notesData.forEach(note => {
             if (Math.abs(x - note.x) < 20 && Math.abs(y - note.y) < 20) { // Threshold for detecting click near note
@@ -51,4 +51,5 @@ function lightUp(x, y) {
     light.style.borderRadius = '50%';
     light.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white for the glow center
     light.style.boxShadow = '0 0 15px 10px rgba(255, 255, 255, 0.5)'; // Soft white glow
-    container.appendChild(light);
+    document.getElementById('container').appendChild(light);
+    
