@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
     "https://i.pinimg.com/1200x/21/90/5d/21905dbb8598de8d025b29b04c0b1f5e.jpg"
     ];
     
-    function resizeCanvas() {
+   function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         ctx.fillStyle = '#000';
@@ -62,61 +62,53 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', resizeCanvas);
 
     function isTooClose(x, y, minDistance) {
-    return notesData.some(note => {
-        const dx = x - note.x;
-        const dy = y - note.y;
-        return Math.sqrt(dx * dx + dy * dy) < minDistance;
-    });
-}
+        return notesData.some(note => {
+            const dx = x - note.x;
+            const dy = y - note.y;
+            return Math.sqrt(dx * dx + dy * dy) < minDistance;
+        });
+    }
 
-for (let i = 0; i < 19; i++) {
-    let note, randomX, randomY, tooClose;
-    do {
-        note = document.createElement('div');
-        note.className = 'music-note';
-        randomX = Math.random() * (canvas.width - 50);
-        randomY = Math.random() * (canvas.height - 50);
-        tooClose = isTooClose(randomX, randomY, 50); // Using 100px as minimum distance
-    } while (tooClose);
-
-    // Create and position music notes, then store their data in notesData
     for (let i = 0; i < 19; i++) {
-        let note = document.createElement('div');
-        note.className = 'music-note';
-        note.style.backgroundImage = `url('${noteImages[i % noteImages.length]}')`;
-        let randomX = Math.random() * (canvas.width - 50); // Assuming 50px is the max size of a note
-        let randomY = Math.random() * (canvas.height - 50);
+        let note, randomX, randomY, tooClose;
+        do {
+            note = document.createElement('div');
+            note.className = 'music-note';
+            randomX = Math.random() * (canvas.width - 50);
+            randomY = Math.random() * (canvas.height - 50);
+            tooClose = isTooClose(randomX, randomY, 50); // Adjust the minimum distance as needed
+        } while (tooClose);
+
         note.style.left = `${randomX}px`;
         note.style.top = `${randomY}px`;
+        note.style.backgroundImage = `url('${noteImages[i % noteImages.length]}')`;
         container.appendChild(note);
 
         notesData.push({ element: note, x: randomX, y: randomY, uncovered: false });
     }
 
-    // Function to create a glow effect with a realistic flashlight beam
     function createGlow(x, y) {
-    const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
-    let gradient = ctx.createRadialGradient(x, y, 0, x, y, 50); // Reduced radius to 50 for a smaller beam
+        const selectedColors = beamColors[Math.floor(Math.random() * beamColors.length)];
+        let gradient = ctx.createRadialGradient(x, y, 0, x, y, 50); // Reduced radius for a smaller beam
 
-    gradient.addColorStop(0, selectedColors[0]);
-    gradient.addColorStop(0.6, selectedColors[1]);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(0, selectedColors[0]); // Intense center
+        gradient.addColorStop(0.6, selectedColors[1]); // Softer edge
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Transparent edge
 
-    ctx.beginPath();
-    ctx.arc(x, y, 50, 0, 2 * Math.PI); // Match the radius used for the gradient
-    ctx.fillStyle = gradient;
-    ctx.fill();
-}
+        ctx.beginPath();
+        ctx.arc(x, y, 50, 0, 2 * Math.PI);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+    }
 
-    // Event listener for mouse clicks on the canvas to reveal notes and create glow
     canvas.addEventListener('mousedown', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
         notesData.forEach(note => {
-            let distance = Math.sqrt(Math.pow(x - (note.x + 25), 2) + Math.pow(y - (note.y + 25), 2)); // Center of note
-            if (distance < 50 && !note.uncovered) { // Click within 50px radius of note center
+            let distance = Math.sqrt(Math.pow(x - (note.x + 25), 2) + Math.pow(y - (note.y + 25), 2));
+            if (distance < 50 && !note.uncovered) {
                 note.element.style.visibility = 'visible';
                 note.uncovered = true;
             }
