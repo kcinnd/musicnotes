@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('overlay');
     const ctx = canvas.getContext('2d');
     const notesData = []; // Array to hold data for each note
+    const litAreas = []; // Array to track lit areas
     const beamRadius = 50; // Radius of the flashlight beam
-    const noteSize = 50;
     
     const beamColors = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
