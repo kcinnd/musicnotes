@@ -47,63 +47,71 @@ document.addEventListener('DOMContentLoaded', function() {
     "https://i.imgur.com/Mz5cEJR.png",
     "https://i.imgur.com/IVHM0uZ.png"
     ];
-    
- function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawNotes(); // Redraw notes on canvas resize to ensure they remain visible
-    }
+    // Preload images and store note data without drawing them
+    noteImages.forEach(src => {
+        const img = new Image();
+        img.onload = () => {
+            let x, y, overlaps;
+            do {
+                x = Math.random() * (canvas.width - img.width);
+                y = Math.random() * (canvas.height - img.height);
+                overlaps = notesData.some(note => {
+                    const dx = note.x - x;
+                    const dy = note.y - y;
+                    return Math.sqrt(dx * dx + dy * dy) < beamRadius * 2; // Ensure notes are at least a beam's width apart
+                });
+            } while (overlaps); // Repeat if overlaps
 
-    function drawNotes() {
-        noteImages.forEach((imageSrc, index) => {
-            const noteImage = new Image();
-            noteImage.src = imageSrc;
-            noteImage.onload = () => {
-                const x = Math.random() * (canvas.width - noteImage.width);
-                const y = Math.random() * (canvas.height - noteImage.height);
-                ctx.drawImage(noteImage, x, y);
-                notesData.push({ image: noteImage, x, y, width: noteImage.width, height: noteImage.height, revealed: false });
-            };
-        });
+            notesData.push({
+                x: x,
+                y: y,
+                width: img.width,
+                height: img.height,
+                image: img,
+                revealed: false
+            });
+        };
+        img.src = src;
+    });
+
+    function drawNoteIfRevealed(note) {
+        if (note.revealed) {
+            ctx.drawImage(note.image, note.x, note.y, note.width, note.height);
+        }
     }
 
     function createGlow(x, y) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous glow effect
-        resizeCanvas(); // Redraw background and notes
-        const glowRadius = 50;
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
-        gradient.addColorStop(0, 'rgba(255, 255, 100, 1)');
-        gradient.addColorStop(1, 'rgba(255, 255, 100, 0)');
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        // Check each note to see if it's within the beam's radius
+        notesData.forEach(note => {
+            const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
+            if (distance < beamRadius) {
+                note.revealed = true;
+            }
+            drawNoteIfRevealed(note); // Draw the note if it's been revealed
+        });
+
+        // Draw the flashlight beam
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.beginPath();
-        ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+        ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
         ctx.fillStyle = gradient;
         ctx.fill();
-    }
-
-    function checkNoteReveal(x, y) {
-        notesData.forEach(note => {
-            if (!note.revealed && x > note.x && x < note.x + note.width && y > note.y && y < note.y + note.height) {
-                note.revealed = true; // Mark the note as revealed
-                // Logic to "reveal" the note, e.g., play a sound or change its appearance
-            }
-        });
     }
 
     canvas.addEventListener('mousemove', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        createGlow(x, y); // Create a glow effect around the mouse cursor
+        createGlow(x, y);
     });
 
-    canvas.addEventListener('mousedown', function(event) {
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        checkNoteReveal(x, y); // Check if a note should be revealed
+    // Resize the canvas to fill browser window dynamically
+    window.addEventListener('resize', function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     });
-
-    resizeCanvas(); // Initial canvas setup
 });
