@@ -63,52 +63,68 @@ document.addEventListener('DOMContentLoaded', function() {
             const img = new Image();
             img.src = src;
             img.onload = () => {
-                const x = Math.random() * (canvas.width - img.width);
-                const y = Math.random() * (canvas.height - img.height);
+                let x, y, overlaps;
+                do {
+                    x = Math.random() * (canvas.width - noteSize);
+                    y = Math.random() * (canvas.height - noteSize);
+                    overlaps = notesData.some(note => {
+                        const dx = note.x - x;
+                        const dy = note.y - y;
+                        return Math.sqrt(dx * dx + dy * dy) < noteSize; // Ensuring notes are not overlapping
+                    });
+                } while (overlaps);
+
                 notesData.push({
                     img: img,
                     x: x,
                     y: y,
-                    revealed: false,
-                    audio: new Audio('path/to/audio' + index + '.mp3') // Associate each note with an audio file
+                    width: noteSize,
+                    height: noteSize,
+                    revealed: false
                 });
             };
         });
     }
 
-    // Function to create the flashlight beam effect and reveal notes
+    function drawNotes() {
+        notesData.forEach(note => {
+            if (note.revealed) {
+                ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
+            }
+        });
+    }
+
     function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
         gradient.addColorStop(0, selectedColor[0]);
-        gradient.addColorStop(1, selectedColor[1]);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw the flashlight beam
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
         ctx.fill();
 
-        // Check each note to see if it's within the beam's radius and reveal it
         notesData.forEach(note => {
-            const distance = Math.sqrt(Math.pow(x - (note.x + note.img.width / 2), 2) + Math.pow(y - (note.y + note.img.height / 2), 2));
+            const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
             if (distance < beamRadius && !note.revealed) {
-                note.revealed = true;
-                ctx.drawImage(note.img, note.x, note.y, note.img.width, note.img.height);
+                note.revealed = true; // Only reveal the note if the beam directly overlaps with it
             }
         });
+
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawNotes(); // Redraw all revealed notes
     }
 
-   canvas.addEventListener('mousemove', function(event) {
+    canvas.addEventListener('click', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         createGlow(x, y);
     });
+
+    window.addEventListener('resize', resizeCanvas);
 
     resizeCanvas();
     preloadNotes();
