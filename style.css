@@ -12,9 +12,9 @@ body, html {
 
 .music-note {
   position: absolute;
-  width: 20px; /* Small size for the music notes */
+  width: 20px; /* Adjust based on your note image size */
   height: 20px;
-  background-image: url('music-note.png'); /* Path to your music note image */
+  background-image: url('https://i.imgur.com/fThpcNc.png'); /* Music note image */
   background-size: cover;
-  display: none; /* Initially hidden */
+  /* Initially visible for positioning, can be hidden and then revealed on click */
 }
