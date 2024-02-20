@@ -59,32 +59,39 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
     // Preload images and store note data without drawing them
    
-   noteImages.forEach((src, index) => {
-            const img = new Image();
-            img.src = src;
-            img.onload = () => {
-                let x, y, overlaps;
-                do {
-                    x = Math.random() * (canvas.width - noteSize);
-                    y = Math.random() * (canvas.height - noteSize);
-                    overlaps = notesData.some(note => {
-                        const dx = note.x - x;
-                        const dy = note.y - y;
-                        return Math.sqrt(dx * dx + dy * dy) < noteSize; // Ensuring notes are not overlapping
-                    });
-                } while (overlaps);
+   noteImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            let x, y, overlaps;
+            do {
+                // Adjust x and y to ensure the entire note is within the canvas
+                x = Math.random() * (canvas.width - img.width);
+                y = Math.random() * (canvas.height - img.height);
 
-                notesData.push({
-                    img: img,
-                    x: x,
-                    y: y,
-                    width: img.width,
-                    height: img.height,
-                    revealed: false
+                // Check for overlaps using the actual dimensions of the loaded image
+                overlaps = notesData.some(note => {
+                    const dx = note.x - x;
+                    const dy = note.y - y;
+                    // Use a simpler overlap check, like bounding box intersection
+                    const distanceX = Math.abs(dx) - (img.width + note.width) / 2;
+                    const distanceY = Math.abs(dy) - (img.height + note.height) / 2;
+                    return distanceX < 0 && distanceY < 0;
                 });
-            };
-        });
-    }
+            } while (overlaps);
+
+            // Push the note data with actual dimensions and loaded image
+            notesData.push({
+                img: img,
+                x: x,
+                y: y,
+                width: img.width,
+                height: img.height,
+                revealed: false
+            });
+        };
+    });
+}
 
     function redrawCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
