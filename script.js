@@ -79,36 +79,23 @@ document.addEventListener('DOMContentLoaded', function() {
     function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
-        gradient.addColorStop(0, selectedColor);
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(0, selectedColor[0]);
+        gradient.addColorStop(1, selectedColor[1]);
 
-        ctx.globalCompositeOperation = 'destination-out';
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
         ctx.fill();
-        ctx.globalCompositeOperation = 'source-over';
 
         notesData.forEach(note => {
             if (!note.revealed && x >= note.x && x <= note.x + note.img.width && y >= note.y && y <= note.y + note.img.height) {
                 note.revealed = true;
-                // Function to handle note click, play or pause the music
-                canvas.addEventListener('click', function(e) {
-                    const clickX = e.clientX - canvas.getBoundingClientRect().left;
-                    const clickY = e.clientY - canvas.getBoundingClientRect().top;
-                    if (clickX >= note.x && clickX <= note.x + note.img.width && clickY >= note.y && clickY <= note.y + note.img.height) {
-                        if (note.audio.paused) {
-                            note.audio.play();
-                        } else {
-                            note.audio.pause();
-                        }
-                    }
-                }, false);
+                // Draw the note now that it's revealed
+                ctx.drawImage(note.img, note.x, note.y);
             }
         });
     }
 
-    // Event listener for mouse click to create the glow effect
     canvas.addEventListener('click', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
