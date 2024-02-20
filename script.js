@@ -82,21 +82,27 @@ document.addEventListener('DOMContentLoaded', function() {
         gradient.addColorStop(0, selectedColor[0]);
         gradient.addColorStop(1, selectedColor[1]);
 
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the flashlight beam
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(x, y, beamRadius, 0, 2 * Math.PI);
         ctx.fill();
 
+        // Check each note to see if it's within the beam's radius and reveal it
         notesData.forEach(note => {
-            if (!note.revealed && x >= note.x && x <= note.x + note.img.width && y >= note.y && y <= note.y + note.img.height) {
+            const distance = Math.sqrt(Math.pow(x - (note.x + note.img.width / 2), 2) + Math.pow(y - (note.y + note.img.height / 2), 2));
+            if (distance < beamRadius && !note.revealed) {
                 note.revealed = true;
-                // Draw the note now that it's revealed
-                ctx.drawImage(note.img, note.x, note.y);
+                ctx.drawImage(note.img, note.x, note.y, note.img.width, note.img.height);
             }
         });
     }
 
-    canvas.addEventListener('click', function(event) {
+   canvas.addEventListener('mousemove', function(event) {
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
