@@ -13,31 +13,41 @@ document.addEventListener('DOMContentLoaded', function() {
         note.style.top = `${randomY}px`;
         note.style.visibility = 'hidden'; // Start with the note hidden
 
+        // Assign the test audio file to each note
+        let audio = new Audio('https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3');
+
         notesData.push({
             element: note,
             x: randomX,
             y: randomY,
-            audio: new Audio('path/to/your/audio/note' + i + '.mp3') // Update path as needed
+            audio: audio
+        });
+
+        // Directly click on the note to play/pause the audio
+        note.addEventListener('click', function() {
+            if (this.style.visibility === 'visible') { // Ensure the note is visible
+                if (audio.paused) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0; // Reset audio to start
+                }
+            }
         });
     }
-    
+
     container.addEventListener('click', function(event) {
         let x = event.pageX - this.offsetLeft;
         let y = event.pageY - this.offsetTop;
 
-        lightUp(x, y); // Restore the light-up effect for the clicked area
-
+        // Check if any note is close to the clicked position
         notesData.forEach(note => {
             if (Math.abs(x - note.x) < 20 && Math.abs(y - note.y) < 20) { // Threshold for detecting click near note
                 note.element.style.visibility = 'visible'; // Make the note visible
-                if (note.audio.paused) {
-                    note.audio.play();
-                } else {
-                    note.audio.pause();
-                    note.audio.currentTime = 0; // Reset audio to start
-                }
             }
         });
+
+        lightUp(x, y); // Glow effect for the clicked area
     });
 });
 
@@ -52,4 +62,5 @@ function lightUp(x, y) {
     light.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white for the glow center
     light.style.boxShadow = '0 0 15px 10px rgba(255, 255, 255, 0.5)'; // Soft white glow
     document.getElementById('container').appendChild(light);
-    
+    // The glow effect will remain permanently
+}
