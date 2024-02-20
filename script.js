@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = canvas.getContext('2d');
     const notesData = []; // Array to hold data for each note
     const beamRadius = 50;
-    const beamColors = [
+    const beamColor = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
     ['rgba(189, 0, 255, 1)', 'rgba(189, 0, 255, 0)'],
     ['rgba(0, 145, 255, 1)', 'rgba(0, 145, 255, 0)'],
@@ -93,16 +93,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to create the flashlight beam effect and reveal notes
     function createGlow(x, y) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+        // Use a composite operation to "mask" the black canvas and reveal where the beam is
+        ctx.globalCompositeOperation = 'destination-out';
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, beamRadius);
+        gradient.addColorStop(0, beamColor);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Transition to transparent
+        ctx.beginPath();
+        ctx.arc(x, y, beamRadius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
 
-    notesData.forEach(note => {
-        const distance = Math.sqrt(Math.pow(x - (note.x + note.width / 2), 2) + Math.pow(y - (note.y + note.height / 2), 2));
-        if (distance < beamRadius) {
-            note.revealed = true;
-        }
-    });
+        // Reset composite operation to default
+        ctx.globalCompositeOperation = 'source-over';
 
-    drawNotes(); // Redraw all revealed notes
+        // Redraw all revealed notes
+        drawNotes();
+    }
 
     // Draw the flashlight beam
     const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
