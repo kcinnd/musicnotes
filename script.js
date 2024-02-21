@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const notesData = []; // Array to hold data for each note
     const litAreas = []; // Array to track lit areas
     const beamRadius = 50; // Radius of the flashlight beam
-    
+
     const beamColors = [
     ['rgba(255, 7, 58, 1)', 'rgba(255, 7, 58, 0)'],
     ['rgba(189, 0, 255, 1)', 'rgba(189, 0, 255, 0)'],
@@ -27,16 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ['rgba(0, 255, 195, 1)', 'rgba(0, 255, 195, 0)']
     ];
 
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        redrawCanvas(); // Redraw the canvas with existing lit areas and notes
-    }
-
-    function preloadNotes() {
-        const noteImages = [
+    const noteImages = [
     "https://i.imgur.com/CJ09TQq.png",
     "https://i.imgur.com/b5fsfMv.png",
     "https://i.imgur.com/iAKvZfs.png",
@@ -57,40 +48,71 @@ document.addEventListener('DOMContentLoaded', function() {
     "https://i.imgur.com/Mz5cEJR.png",
     "https://i.imgur.com/IVHM0uZ.png"
     ];
-    // Preload images and store note data without drawing them
-   
-   noteImages.forEach(src => {
+
+    const audioClips = [
+    "https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3",
+    "https://audio.jukehost.co.uk/gVJZ29CcDLHA2eu5N2ZRthH68jtWW6Gw.mp3",
+    "https://audio.jukehost.co.uk/kuI9Js3hy2kiVgojRv2yiaORL7tYYlAX.mp3",
+    "https://audio.jukehost.co.uk/hkfgqlNOAxj1LgWDOBQhRTbzxq0a3xBV.mp3",
+    "https://audio.jukehost.co.uk/lXCaYbwjVyRzckOilvVZxdg9MJOwy9xN.mp3",
+    "https://audio.jukehost.co.uk/84b4xaUM74UJaRWCbVVeUCF822yTximk.mp3",
+    "https://audio.jukehost.co.uk/e0cf53pFpqlBHa3mWIe9EFoZKNKUzjo3.mp3",
+    "https://audio.jukehost.co.uk/XTKnG2oLrq1UxCHq5yHa2hp71kkaLHAY.mp3",
+    "https://audio.jukehost.co.uk/xk3OfU1NDtUeRUQPlbcGmt8uNG3Hyr0m.mp3",
+    "https://audio.jukehost.co.uk/hB9tnsYoYcOTi70O0oi5auIU3ZL6BEJx.mp3",
+    "https://audio.jukehost.co.uk/WBe5RCJJP1vMfuaewKp1T39qm8Bm0auc.mp3",
+    "https://audio.jukehost.co.uk/Zs2Ef5WCCqJswEUHc18CjbezfCl9gseq.mp3",
+    "https://audio.jukehost.co.uk/26mQRqqYvPTbYVxegWXphWfYzPvlitOA.mp3",
+    "https://audio.jukehost.co.uk/3rJtM3HgdQKHPj6NVcsANgc39sPIlwfR.mp3",
+    "https://audio.jukehost.co.uk/vAVSRkgnD3jff7jYigFHdZlV4gxkdUfQ.mp3",
+    "https://audio.jukehost.co.uk/xHRDRPYmIWURW5h4YTpgP3zZhl24NHBn.mp3",
+    "https://audio.jukehost.co.uk/Pkce3RxLuRVE31dMiSiUqeSQt4FaamBB.mp3",
+    "https://audio.jukehost.co.uk/2gRP6adaDph5ZaHRDaBZNhiggfhPhmGa.mp3",
+    "https://audio.jukehost.co.uk/sSUTAJ1O3JYJ8nNfuV5LC55avoRySwAZ.mp3"
+    ];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        redrawCanvas(); // Redraw the canvas with existing lit areas and notes
+    }
+
+    function preloadNotes() {
+        noteImages.forEach((src, index) => {
             const img = new Image();
             img.src = src;
             img.onload = () => {
                 let x, y, overlaps;
-                let attempts = 0; // Counter for the number of placement attempts
+                let attempts = 0;
                 const maxAttempts = 100;
+
                 do {
-                x = Math.random() * (canvas.width - img.width);
-                y = Math.random() * (canvas.height - img.height);
-                overlaps = notesData.some(note => {
-                    const dx = note.x - x;
-                    const dy = note.y - y;
-                    return Math.sqrt(dx * dx + dy * dy) < beamRadius;
-                });
+                    x = Math.random() * (canvas.width - img.width);
+                    y = Math.random() * (canvas.height - img.height);
+                    overlaps = notesData.some(note => {
+                        const dx = note.x - x;
+                        const dy = note.y - y;
+                        return Math.sqrt(dx * dx + dy * dy) < beamRadius;
+                    });
 
-                attempts++;
-                if (attempts > maxAttempts) {
-                    console.warn('Maximum placement attempts reached for a note. Consider adjusting the spacing or canvas size.');
-                    break; // Exit the loop if the max number of attempts is exceeded
-                }
-            } while (overlaps);
+                    attempts++;
+                    if (attempts > maxAttempts) {
+                        console.warn('Maximum placement attempts reached for a note. Consider adjusting the spacing or canvas size.');
+                        break;
+                    }
+                } while (overlaps);
 
-            notesData.push({
-                img: img,
-                x: x,
-                y: y,
-                width: img.width,
-                height: img.height,
-                revealed: false,
-                revealProgress: 0,
-                    audio: new Audio('https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3') // Assuming you have corresponding audio files
+                notesData.push({
+                    img: img,
+                    x: x,
+                    y: y,
+                    width: img.width,
+                    height: img.height,
+                    revealed: false,
+                    revealProgress: 0,
+                    audio: new Audio(audioClips[index]) // Assign the corresponding audio clip
                 });
             };
         });
@@ -101,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-       litAreas.forEach(area => {
+        litAreas.forEach(area => {
             const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, beamRadius);
             gradient.addColorStop(0, area.color[0]);
             gradient.addColorStop(1, area.color[1]);
@@ -114,23 +136,23 @@ document.addEventListener('DOMContentLoaded', function() {
         notesData.forEach(note => {
             if (note.revealed || note.revealProgress > 0) {
                 const opacity = note.revealProgress / 100;
-                ctx.globalAlpha = opacity; // Use globalAlpha for partial transparency
+                ctx.globalAlpha = opacity;
                 ctx.drawImage(note.img, note.x, note.y, note.width, note.height);
-                ctx.globalAlpha = 1.0; // Reset globalAlpha
+                ctx.globalAlpha = 1.0;
             }
         });
     }
 
-   function createGlow(x, y) {
+    function createGlow(x, y) {
         const selectedColor = beamColors[Math.floor(Math.random() * beamColors.length)];
         litAreas.push({ x, y, color: selectedColor });
 
         notesData.forEach(note => {
             const distance = Math.hypot(x - (note.x + note.width / 2), y - (note.y + note.height / 2));
             if (distance <= beamRadius) {
-                note.revealProgress = Math.min(note.revealProgress + 20, 100); // Increment reveal progress
+                note.revealProgress = Math.min(note.revealProgress + 20, 100);
                 if (note.revealProgress >= 100) {
-                    note.revealed = true; // Mark as fully revealed
+                    note.revealed = true;
                 }
             }
         });
@@ -146,13 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         notesData.forEach(note => {
             if (note.revealed) {
-                const noteRect = {
-                    left: note.x,
-                    right: note.x + note.width,
-                    top: note.y,
-                    bottom: note.y + note.height
-                };
-
+                const noteRect = { left: note.x, right: note.x + note.width, top: note.y, bottom: note.y + note.height };
                 if (x >= noteRect.left && x <= noteRect.right && y >= noteRect.top && y <= noteRect.bottom) {
                     if (note.audio.paused) {
                         note.audio.play();
