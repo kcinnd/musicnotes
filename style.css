@@ -27,7 +27,3 @@
     visibility: hidden; /* Notes are initially hidden and become visible when "lit up" */
     cursor: pointer; /* Changes the cursor to a pointer when hovering over a note (optional) */
 }
-
-/* Additional styles if needed */
-/* You might want to add styles for other elements or states, such as a hover effect for the notes,
-   a background for the container, or custom fonts and colors for other text or UI elements within the container. */
