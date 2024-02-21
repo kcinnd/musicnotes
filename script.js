@@ -64,24 +64,32 @@ document.addEventListener('DOMContentLoaded', function() {
             img.src = src;
             img.onload = () => {
                 let x, y, overlaps;
+                let attempts = 0; // Counter for the number of placement attempts
+                const maxAttempts = 100;
                 do {
-                    x = Math.random() * (canvas.width - img.width);
-                    y = Math.random() * (canvas.height - img.height);
-                    overlaps = notesData.some(note => {
-                        const dx = note.x - x;
-                        const dy = note.y - y;
-                        return Math.sqrt(dx * dx + dy * dy) < beamRadius; // Adjusted for beam radius
-                    });
-                } while (overlaps);
+                x = Math.random() * (canvas.width - img.width);
+                y = Math.random() * (canvas.height - img.height);
+                overlaps = notesData.some(note => {
+                    const dx = note.x - x;
+                    const dy = note.y - y;
+                    return Math.sqrt(dx * dx + dy * dy) < beamRadius;
+                });
 
-                notesData.push({
-                    img: img,
-                    x: x,
-                    y: y,
-                    width: img.width,
-                    height: img.height,
-                    revealed: false,
-                    revealProgress: 0,
+                attempts++;
+                if (attempts > maxAttempts) {
+                    console.warn('Maximum placement attempts reached for a note. Consider adjusting the spacing or canvas size.');
+                    break; // Exit the loop if the max number of attempts is exceeded
+                }
+            } while (overlaps);
+
+            notesData.push({
+                img: img,
+                x: x,
+                y: y,
+                width: img.width,
+                height: img.height,
+                revealed: false,
+                revealProgress: 0
                     audio: new Audio('https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3') // Assuming you have corresponding audio files
                 });
             };
