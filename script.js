@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 width: img.width,
                 height: img.height,
                 revealed: false,
-                revealProgress: 0
+                revealProgress: 0,
                     audio: new Audio('https://audio.jukehost.co.uk/aOz6KfillnraJHw8E38nj0c8T4uJk3uG.mp3') // Assuming you have corresponding audio files
                 });
             };
