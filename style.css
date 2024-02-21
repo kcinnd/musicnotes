@@ -1,29 +1,21 @@
-/* Style for the container that holds the canvas and music notes */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Prevents scrolling if canvas is larger than the viewport */
+}
+
 #container {
     position: relative;
     width: 100%;
     height: 100%;
-    background-color: black;
+    background-color: #000; /* Gives a black background to the container */
 }
 
-/* Style for the canvas overlay */
 #overlay {
-    background: #000;
-    position: absolute; /* Positioned relative to its parent due to parent's relative positioning */
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%; /* Full width of the container */
-    height: 100%; /* Full height of the container */
-}
-
-/* Style for the music notes */
-.music-note {
-    position: absolute; /* Positioned absolutely within the container */
-    width: 50px; /* Adjust based on the size of your images */
-    height: 50px; /* Adjust based on the size of your images */
-    background-size: cover; /* Ensures the image covers the note area without distortion */
-    background-repeat: no-repeat; /* Prevents the image from repeating within the note */
-    background-position: center; /* Centers the background image within the note */
-    visibility: hidden; /* Notes are initially hidden and become visible when "lit up" */
-    cursor: pointer; /* Changes the cursor to a pointer when hovering over a note (optional) */
+    width: 100%;
+    height: 100%;
 }
